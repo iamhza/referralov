@@ -64,21 +64,21 @@ export const MetricsOverview = () => {
           value: "24",
           description: "12 in progress, 4 pending",
           icon: <ArrowRight className="h-5 w-5 text-referra-500" />,
-          variant: 'default' as const
+          variant: 'default'
         },
         {
           title: "Pending Matches",
           value: "8",
           description: "Awaiting provider selection",
           icon: <Clock className="h-5 w-5 text-amber-500" />,
-          variant: 'warning' as const
+          variant: 'warning'
         },
         {
           title: "Completed Referrals",
           value: "186",
           description: "Last 30 days: 42",
           icon: <Check className="h-5 w-5 text-green-500" />,
-          variant: 'compliant' as const
+          variant: 'compliant'
         }
       ]
     },
@@ -90,14 +90,14 @@ export const MetricsOverview = () => {
           value: "98",
           description: "14 newly onboarded",
           icon: <Users className="h-5 w-5 text-referra-500" />,
-          variant: 'default' as const
+          variant: 'default'
         },
         {
           title: "Currently Onboarding",
           value: "17",
           description: "5 awaiting intake",
           icon: <User className="h-5 w-5 text-amber-500" />,
-          variant: 'neutral' as const
+          variant: 'neutral'
         }
       ]
     },
@@ -109,7 +109,7 @@ export const MetricsOverview = () => {
           value: "5",
           description: "Requires immediate attention",
           icon: <AlertCircle className="h-5 w-5 text-red-500" />,
-          variant: 'attention' as const
+          variant: 'attention'
         }
       ]
     }
