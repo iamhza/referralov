@@ -6,7 +6,7 @@ import ClientTable from '@/components/dashboard/ClientTable';
 import ReferralPipeline from '@/components/dashboard/ReferralPipeline';
 import FeaturedProviders from '@/components/dashboard/FeaturedProviders';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Plus, Clock } from 'lucide-react';
+import { ArrowRight, Plus, Clock, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
