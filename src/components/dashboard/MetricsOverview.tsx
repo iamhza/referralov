@@ -17,16 +17,16 @@ interface MetricCardProps {
 
 const MetricCard = ({ title, value, icon, description, trend, className }: MetricCardProps) => (
   <div className={cn(
-    "bg-white rounded-xl p-6 shadow-card transition-all duration-300 hover:shadow-lg group", 
+    "bg-white rounded-xl p-5 shadow-sm transition-all duration-300 hover:shadow-md", 
     className
   )}>
     <div className="flex justify-between items-start">
       <div>
         <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-        <p className="text-2xl font-bold mt-1">{value}</p>
-        {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+        <p className="text-xl font-bold mt-1">{value}</p>
+        {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
         {trend && (
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-1">
             <span className={cn(
               "text-xs font-medium",
               trend.isPositive ? "text-green-600" : "text-red-600"
@@ -37,7 +37,7 @@ const MetricCard = ({ title, value, icon, description, trend, className }: Metri
           </div>
         )}
       </div>
-      <div className="p-2 rounded-lg bg-gray-50 group-hover:bg-referra-50 transition-colors duration-300">
+      <div className="p-2 rounded-lg bg-gray-50">
         {icon}
       </div>
     </div>
@@ -46,7 +46,7 @@ const MetricCard = ({ title, value, icon, description, trend, className }: Metri
 
 export const MetricsOverview = () => {
   return (
-    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       <MetricCard
         title="Active Referrals"
         value="24"

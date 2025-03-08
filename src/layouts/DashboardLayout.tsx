@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { SidebarProvider, Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger } from "@/components/ui/sidebar";
-import { Home, Users, ArrowRight, List, MessageSquare, Calendar, Star } from 'lucide-react';
+import { Home, Users, ArrowRight, List, MessageSquare, Calendar, Star, Menu } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -74,7 +75,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <span className="text-xs text-gray-500 block mt-1">9:47 AM</span>
             </div>
           </div>
-          {/* Additional messages would go here */}
         </div>
       </div>
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-white">
@@ -97,67 +97,39 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   );
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar className="border-r">
-          <div className="p-4">
-            <div className="flex items-center gap-2 px-2">
-              <div className="bg-referra-500 text-white p-1.5 rounded">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                </svg>
-              </div>
-              <span className="text-xl font-semibold">Referra</span>
-            </div>
-          </div>
-          
-          <SidebarContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton asChild className={cn(
-                    location.pathname === item.path && "bg-accent"
-                  )}>
-                    <Link to={item.path} className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
-          
-          <SidebarFooter className="p-4 border-t">
-            <div className="flex items-center gap-3 px-2">
-              <Avatar>
-                <div className="bg-referra-200 text-referra-800 w-10 h-10 rounded-full flex items-center justify-center">
-                  CM
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Top Navigation */}
+      <header className="bg-white border-b shadow-sm sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto">
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center justify-between h-16 px-6">
+            <div className="flex items-center space-x-8">
+              <div className="flex items-center gap-2">
+                <div className="bg-referra-500 text-white p-1.5 rounded">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
                 </div>
-              </Avatar>
-              <div>
-                <div className="font-medium">Case Manager</div>
-                <div className="text-xs text-muted-foreground">manager@agency.org</div>
+                <span className="text-xl font-semibold">Referra</span>
               </div>
+              <nav className="flex items-center space-x-1">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                      location.pathname === item.path
+                        ? "bg-gray-100 text-referra-600"
+                        : "text-gray-700 hover:bg-gray-50 hover:text-referra-500"
+                    )}
+                  >
+                    {item.title}
+                  </Link>
+                ))}
+              </nav>
             </div>
-          </SidebarFooter>
-        </Sidebar>
-        
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="h-16 border-b bg-white flex items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <h1 className="text-xl font-semibold hidden sm:block">
-                {menuItems.find(item => item.path === location.pathname)?.title || "Dashboard"}
-              </h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Calendar className="h-5 w-5 text-gray-500" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Star className="h-5 w-5 text-gray-500" />
-              </button>
+            <div className="flex items-center space-x-3">
               <button 
                 onClick={() => setShowMessages(true)}
                 className="p-2 hover:bg-gray-100 rounded-full relative"
@@ -165,21 +137,100 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <MessageSquare className="h-5 w-5 text-gray-500" />
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">2</span>
               </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <Calendar className="h-5 w-5 text-gray-500" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <Star className="h-5 w-5 text-gray-500" />
+              </button>
+              <div className="border-l h-6 mx-2"></div>
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <div className="bg-referra-200 text-referra-800 w-8 h-8 rounded-full flex items-center justify-center">
+                    CM
+                  </div>
+                </Avatar>
+                <div className="hidden xl:block">
+                  <div className="font-medium text-sm">Case Manager</div>
+                  <div className="text-xs text-muted-foreground">manager@agency.org</div>
+                </div>
+              </div>
             </div>
-          </header>
+          </div>
           
-          <main className="flex-1 overflow-y-auto bg-gray-50">
-            <div className="animate-fade-in">
-              {children}
+          {/* Mobile Nav */}
+          <div className="flex md:hidden items-center justify-between h-16 px-4">
+            <div className="flex items-center gap-2">
+              <div className="bg-referra-500 text-white p-1.5 rounded">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                </svg>
+              </div>
+              <span className="text-lg font-semibold">Referra</span>
             </div>
-          </main>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setShowMessages(true)}
+                className="p-2 hover:bg-gray-100 rounded-full relative"
+              >
+                <MessageSquare className="h-5 w-5 text-gray-500" />
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">2</span>
+              </button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right">
+                  <nav className="flex flex-col space-y-4 mt-6">
+                    {menuItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                          location.pathname === item.path
+                            ? "bg-gray-100 text-referra-600"
+                            : "text-gray-700 hover:bg-gray-50 hover:text-referra-500"
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.title}
+                      </Link>
+                    ))}
+                  </nav>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="flex items-center gap-3 px-2 py-4 border-t">
+                      <Avatar>
+                        <div className="bg-referra-200 text-referra-800 w-10 h-10 rounded-full flex items-center justify-center">
+                          CM
+                        </div>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">Case Manager</div>
+                        <div className="text-xs text-muted-foreground">manager@agency.org</div>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
         </div>
-        
-        {/* Messaging UI */}
-        <MessageButton />
-        <MessagePanel />
-      </div>
-    </SidebarProvider>
+      </header>
+      
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="animate-fade-in">
+          {children}
+        </div>
+      </main>
+      
+      {/* Messaging UI */}
+      <MessageButton />
+      <MessagePanel />
+    </div>
   );
 };
 

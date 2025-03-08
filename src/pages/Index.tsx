@@ -8,14 +8,15 @@ import FeaturedProviders from '@/components/dashboard/FeaturedProviders';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   return (
     <DashboardLayout>
       <div className="page-container">
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Welcome back, Case Manager</h1>
+            <h1 className="text-2xl font-bold">Welcome back, Case Manager</h1>
             <p className="text-gray-500 mt-1">Here's what's happening with your referrals today</p>
           </div>
           <Button className="bg-referra-500 hover:bg-referra-600 transition-colors" asChild>
@@ -27,28 +28,34 @@ const Index = () => {
         </div>
         
         {/* Metrics Overview */}
-        <div className="mb-8">
+        <div className="mb-6">
           <MetricsOverview />
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Client Table */}
-          <div className="lg:col-span-2">
-            <ClientTable />
-          </div>
+        {/* Tabbed Content for Cleaner Organization */}
+        <Tabs defaultValue="clients" className="mb-6">
+          <TabsList className="mb-4">
+            <TabsTrigger value="clients">Client Overview</TabsTrigger>
+            <TabsTrigger value="pipeline">Referral Pipeline</TabsTrigger>
+            <TabsTrigger value="providers">Featured Providers</TabsTrigger>
+          </TabsList>
           
-          {/* Right Column - Featured Providers */}
-          <div>
-            <FeaturedProviders />
-          </div>
-        </div>
+          <TabsContent value="clients" className="mt-0">
+            <ClientTable />
+          </TabsContent>
+          
+          <TabsContent value="pipeline" className="mt-0">
+            <ReferralPipeline />
+          </TabsContent>
+          
+          <TabsContent value="providers" className="mt-0">
+            <div className="bg-white p-6 rounded-xl shadow-card">
+              <FeaturedProviders />
+            </div>
+          </TabsContent>
+        </Tabs>
         
-        {/* Referral Pipeline */}
-        <div className="mt-8">
-          <ReferralPipeline />
-        </div>
-        
-        <div className="mt-8 text-center">
+        <div className="text-center">
           <Link to="/referrals" className="inline-flex items-center text-referra-600 hover:text-referra-700">
             <span className="font-medium">View all referrals</span>
             <ArrowRight className="h-4 w-4 ml-1" />
