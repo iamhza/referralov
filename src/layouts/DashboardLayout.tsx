@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, ArrowRight, List, MessageSquare, Calendar, Star, Menu } from 'lucide-react';
+import { Home, Users, ArrowRight, List, MessageSquare, Calendar, Star, Bell, Settings } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -100,11 +99,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Top Navigation */}
       <header className="bg-white border-b shadow-sm sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto">
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center justify-between h-16 px-6">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <div className="flex items-center gap-2 mr-8">
                 <div className="bg-referra-500 text-white p-1.5 rounded">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
@@ -112,7 +110,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 </div>
                 <span className="text-xl font-semibold">Referra</span>
               </div>
-              <nav className="flex items-center space-x-1">
+              
+              <nav className="hidden md:flex items-center space-x-1">
                 {menuItems.map((item) => (
                   <Link
                     key={item.path}
@@ -129,6 +128,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 ))}
               </nav>
             </div>
+            
             <div className="flex items-center space-x-3">
               <button 
                 onClick={() => setShowMessages(true)}
@@ -138,10 +138,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">2</span>
               </button>
               <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Calendar className="h-5 w-5 text-gray-500" />
+                <Bell className="h-5 w-5 text-gray-500" />
               </button>
               <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Star className="h-5 w-5 text-gray-500" />
+                <Settings className="h-5 w-5 text-gray-500" />
               </button>
               <div className="border-l h-6 mx-2"></div>
               <div className="flex items-center gap-3">
@@ -157,66 +157,49 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </div>
             </div>
           </div>
-          
-          {/* Mobile Nav */}
-          <div className="flex md:hidden items-center justify-between h-16 px-4">
-            <div className="flex items-center gap-2">
-              <div className="bg-referra-500 text-white p-1.5 rounded">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                </svg>
-              </div>
-              <span className="text-lg font-semibold">Referra</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setShowMessages(true)}
-                className="p-2 hover:bg-gray-100 rounded-full relative"
-              >
-                <MessageSquare className="h-5 w-5 text-gray-500" />
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">2</span>
-              </button>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right">
-                  <nav className="flex flex-col space-y-4 mt-6">
-                    {menuItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                          location.pathname === item.path
-                            ? "bg-gray-100 text-referra-600"
-                            : "text-gray-700 hover:bg-gray-50 hover:text-referra-500"
-                        )}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {item.title}
-                      </Link>
-                    ))}
-                  </nav>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="flex items-center gap-3 px-2 py-4 border-t">
-                      <Avatar>
-                        <div className="bg-referra-200 text-referra-800 w-10 h-10 rounded-full flex items-center justify-center">
-                          CM
-                        </div>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">Case Manager</div>
-                        <div className="text-xs text-muted-foreground">manager@agency.org</div>
-                      </div>
+        </div>
+        
+        {/* Mobile menu button */}
+        <div className="md:hidden flex justify-end px-4 py-2">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <List className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <nav className="flex flex-col space-y-4 mt-6">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                      location.pathname === item.path
+                        ? "bg-gray-100 text-referra-600"
+                        : "text-gray-700 hover:bg-gray-50 hover:text-referra-500"
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.title}
+                  </Link>
+                ))}
+              </nav>
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="flex items-center gap-3 px-2 py-4 border-t">
+                  <Avatar>
+                    <div className="bg-referra-200 text-referra-800 w-10 h-10 rounded-full flex items-center justify-center">
+                      CM
                     </div>
+                  </Avatar>
+                  <div>
+                    <div className="font-medium">Case Manager</div>
+                    <div className="text-xs text-muted-foreground">manager@agency.org</div>
                   </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-          </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
       
