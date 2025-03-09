@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ArrowRight, Clock, Check, AlertCircle, Users, User, Flame, AlertTriangle, Zap, FileCheck, UserPlus, RotateCw, UserX } from 'lucide-react';
+import { ArrowRight, Clock, Check, AlertCircle, Users, User, Flame, AlertTriangle, Zap, FileCheck, UserPlus, RotateCw, UserX, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,7 +62,6 @@ const MetricCard = ({
 };
 
 const WelcomeHeader = () => {
-  // Get current time for greeting
   const hour = new Date().getHours();
   let greeting;
   
@@ -171,13 +169,10 @@ export const MetricsOverview = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Header */}
       <WelcomeHeader />
       
-      {/* Primary Action Buttons */}
       <ActionCTABox />
       
-      {/* Metrics Categories */}
       {categories.map((category, idx) => (
         <div key={idx} className="mb-8">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">
