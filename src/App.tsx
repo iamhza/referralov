@@ -19,6 +19,11 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/new-referral" element={<NewReferral />} />
+          <Route path="/pending-matches" element={<Index />} />
+          <Route path="/urgent-referrals" element={<Index />} />
+          <Route path="/clients/intake" element={<Index />} />
+          <Route path="/active-referrals" element={<Index />} />
+          <Route path="/completed-referrals" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

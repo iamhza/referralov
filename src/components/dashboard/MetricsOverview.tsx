@@ -13,6 +13,7 @@ interface MetricCardProps {
   description?: string;
   className?: string;
   variant?: 'default' | 'attention' | 'compliant' | 'warning' | 'neutral';
+  onClick?: () => void;
 }
 
 const MetricCard = ({ 
@@ -21,7 +22,8 @@ const MetricCard = ({
   icon, 
   description, 
   className,
-  variant = 'default'
+  variant = 'default',
+  onClick
 }: MetricCardProps) => {
   const getVariantStyles = () => {
     switch (variant) {
@@ -39,11 +41,15 @@ const MetricCard = ({
   };
 
   return (
-    <Card className={cn(
-      "bg-white rounded-lg shadow-sm p-5 flex justify-between items-start", 
-      getVariantStyles(),
-      className
-    )}>
+    <Card 
+      className={cn(
+        "bg-white rounded-lg shadow-sm p-5 flex justify-between items-start transition-all duration-300 hover:shadow-md", 
+        getVariantStyles(),
+        onClick && "cursor-pointer",
+        className
+      )}
+      onClick={onClick}
+    >
       <div>
         <h3 className="text-sm font-medium text-gray-500">{title}</h3>
         <p className="text-2xl font-bold mt-1">{value}</p>
@@ -56,20 +62,44 @@ const MetricCard = ({
   );
 };
 
+const WelcomeHeader = () => {
+  // Get current time for greeting
+  const hour = new Date().getHours();
+  let greeting;
+  
+  if (hour < 12) greeting = "Good morning";
+  else if (hour < 18) greeting = "Good afternoon";
+  else greeting = "Good evening";
+  
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">{greeting}, Case Manager</h1>
+          <p className="text-gray-500">Here's what's happening with your referrals today</p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-gray-500">Today's Date</p>
+          <p className="text-lg font-medium">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ActionCTABox = () => {
   return (
-    <Card className="bg-gradient-to-r from-referra-500/10 to-referra-600/5 p-6 border-none shadow-sm">
-      <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+    <Card className="bg-white p-6 shadow-sm border border-gray-100 rounded-lg mb-6">
       <div className="flex flex-col sm:flex-row gap-3">
-        <Button className="bg-referra-500 hover:bg-referra-600 transition-colors flex-grow" asChild>
+        <Button className="bg-referra-500 hover:bg-referra-600 transition-colors flex-grow h-12 text-base shadow-sm" asChild>
           <Link to="/new-referral">
-            <ArrowRight className="h-4 w-4 mr-2" />
+            <Plus className="h-5 w-5 mr-2" />
             <span>New Referral Request</span>
           </Link>
         </Button>
-        <Button variant="outline" className="border-referra-500 text-referra-600 hover:bg-referra-50 flex-grow" asChild>
+        <Button variant="outline" className="border-referra-500 text-referra-600 hover:bg-referra-50 flex-grow h-12 text-base" asChild>
           <Link to="/pending-matches">
-            <Clock className="h-4 w-4 mr-2" />
+            <Clock className="h-5 w-5 mr-2" />
             <span>Review Pending Matches</span>
           </Link>
         </Button>
@@ -81,63 +111,59 @@ const ActionCTABox = () => {
 export const MetricsOverview = () => {
   const categories = [
     {
-      title: "Referrals Overview",
-      description: "Priority First",
+      title: "Priority Actions",
       cards: [
         {
-          title: "Urgent Actions",
+          title: "Urgent Referrals",
           value: "5",
-          description: "🔥 Needs Immediate Action",
+          description: "Needs immediate attention",
           icon: <Flame className="h-5 w-5 text-red-500" />,
-          variant: 'attention' as const
+          variant: 'attention' as const,
+          path: "/urgent-referrals"
         },
         {
           title: "Pending Matches",
           value: "8",
-          description: "🚨 Needs Provider Selection",
+          description: "Awaiting provider selection",
           icon: <AlertTriangle className="h-5 w-5 text-amber-500" />,
-          variant: 'warning' as const
+          variant: 'warning' as const,
+          path: "/pending-matches"
         },
         {
-          title: "Active Referrals",
-          value: "24",
-          description: "⚡ Ongoing Cases",
-          icon: <Zap className="h-5 w-5 text-referra-500" />,
-          variant: 'default' as const
-        },
-        {
-          title: "Completed Referrals",
-          value: "186",
-          description: "✅ Last 30 days: 42",
-          icon: <FileCheck className="h-5 w-5 text-green-500" />,
-          variant: 'compliant' as const
+          title: "Clients Awaiting Intake",
+          value: "17",
+          description: "Needs processing",
+          icon: <UserPlus className="h-5 w-5 text-referra-500" />,
+          variant: 'default' as const,
+          path: "/clients/intake"
         }
       ]
     },
     {
-      title: "Client Status",
-      description: "Only What Matters",
+      title: "Referral Statistics",
       cards: [
         {
-          title: "Clients Awaiting Intake",
-          value: "17",
-          description: "📌 Needs Processing",
-          icon: <UserPlus className="h-5 w-5 text-referra-500" />,
-          variant: 'default' as const
+          title: "Active Referrals",
+          value: "24",
+          description: "Currently in progress",
+          icon: <Zap className="h-5 w-5 text-referra-500" />,
+          variant: 'default' as const,
+          path: "/active-referrals"
         },
         {
-          title: "Clients with Active Referrals",
-          value: "32",
-          description: "🔄 Still in Progress",
-          icon: <RotateCw className="h-5 w-5 text-amber-500" />,
+          title: "Completed This Month",
+          value: "42",
+          description: "186 all-time completed",
+          icon: <FileCheck className="h-5 w-5 text-green-500" />,
+          variant: 'compliant' as const,
+          path: "/completed-referrals"
+        },
+        {
+          title: "Avg. Completion Time",
+          value: "4.2 days",
+          description: "↓ 0.8 days from last month",
+          icon: <RotateCw className="h-5 w-5 text-gray-500" />,
           variant: 'neutral' as const
-        },
-        {
-          title: "Clients in Urgent Status",
-          value: "7",
-          description: "🚨 Requires Immediate Attention",
-          icon: <UserX className="h-5 w-5 text-red-500" />,
-          variant: 'attention' as const
         }
       ]
     }
@@ -145,21 +171,19 @@ export const MetricsOverview = () => {
 
   return (
     <div className="space-y-6">
-      {/* Action CTA Box */}
-      <div className="mb-2">
-        <ActionCTABox />
-      </div>
+      {/* Welcome Header */}
+      <WelcomeHeader />
+      
+      {/* Primary Action Buttons */}
+      <ActionCTABox />
       
       {/* Metrics Categories */}
       {categories.map((category, idx) => (
-        <div key={idx} className="space-y-4">
-          <div className="flex items-baseline">
-            <h2 className="text-lg font-semibold">
-              {category.title}
-            </h2>
-            <span className="ml-2 text-xs text-gray-500">{category.description}</span>
-          </div>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div key={idx} className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">
+            {category.title}
+          </h2>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             {category.cards.map((card, cardIdx) => (
               <MetricCard
                 key={cardIdx}
@@ -168,6 +192,7 @@ export const MetricsOverview = () => {
                 description={card.description}
                 icon={card.icon}
                 variant={card.variant}
+                onClick={card.path ? () => window.location.href = card.path : undefined}
               />
             ))}
           </div>
