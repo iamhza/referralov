@@ -1,4 +1,3 @@
-
 import React from 'react';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import MetricsOverview from '@/components/dashboard/MetricsOverview';
@@ -20,15 +19,9 @@ const Index = () => {
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <p className="text-gray-500 mt-1">Last updated 24 minutes ago</p>
           </div>
-          <Button className="bg-referra-500 hover:bg-referra-600 transition-colors" asChild>
-            <Link to="/new-referral">
-              <Plus className="h-4 w-4 mr-2" />
-              <span>New Referral Request</span>
-            </Link>
-          </Button>
         </div>
         
-        {/* Metrics Overview */}
+        {/* Metrics Overview with new layout */}
         <div className="mb-8">
           <MetricsOverview />
         </div>

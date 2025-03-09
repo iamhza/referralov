@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { ArrowRight, Clock, Check, AlertCircle, Users, User } from 'lucide-react';
+import { ArrowRight, Clock, Check, AlertCircle, Users, User, Flame, AlertTriangle, Zap, FileCheck, UserPlus, RotateCw, UserX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface MetricCardProps {
   title: string;
@@ -54,61 +56,87 @@ const MetricCard = ({
   );
 };
 
+const ActionCTABox = () => {
+  return (
+    <Card className="bg-gradient-to-r from-referra-500/10 to-referra-600/5 p-6 border-none shadow-sm">
+      <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button className="bg-referra-500 hover:bg-referra-600 transition-colors flex-grow" asChild>
+          <Link to="/new-referral">
+            <ArrowRight className="h-4 w-4 mr-2" />
+            <span>New Referral Request</span>
+          </Link>
+        </Button>
+        <Button variant="outline" className="border-referra-500 text-referra-600 hover:bg-referra-50 flex-grow" asChild>
+          <Link to="/pending-matches">
+            <Clock className="h-4 w-4 mr-2" />
+            <span>Review Pending Matches</span>
+          </Link>
+        </Button>
+      </div>
+    </Card>
+  );
+};
+
 export const MetricsOverview = () => {
   const categories = [
     {
-      title: "Referrals",
+      title: "Referrals Overview",
+      description: "Priority First",
       cards: [
         {
-          title: "Active Referrals",
-          value: "24",
-          description: "12 in progress, 4 pending",
-          icon: <ArrowRight className="h-5 w-5 text-referra-500" />,
-          variant: 'default' as const
+          title: "Urgent Actions",
+          value: "5",
+          description: "🔥 Needs Immediate Action",
+          icon: <Flame className="h-5 w-5 text-red-500" />,
+          variant: 'attention' as const
         },
         {
           title: "Pending Matches",
           value: "8",
-          description: "Awaiting provider selection",
-          icon: <Clock className="h-5 w-5 text-amber-500" />,
+          description: "🚨 Needs Provider Selection",
+          icon: <AlertTriangle className="h-5 w-5 text-amber-500" />,
           variant: 'warning' as const
+        },
+        {
+          title: "Active Referrals",
+          value: "24",
+          description: "⚡ Ongoing Cases",
+          icon: <Zap className="h-5 w-5 text-referra-500" />,
+          variant: 'default' as const
         },
         {
           title: "Completed Referrals",
           value: "186",
-          description: "Last 30 days: 42",
-          icon: <Check className="h-5 w-5 text-green-500" />,
+          description: "✅ Last 30 days: 42",
+          icon: <FileCheck className="h-5 w-5 text-green-500" />,
           variant: 'compliant' as const
         }
       ]
     },
     {
-      title: "Clients",
+      title: "Client Status",
+      description: "Only What Matters",
       cards: [
         {
-          title: "Total Clients",
-          value: "98",
-          description: "14 newly onboarded",
-          icon: <Users className="h-5 w-5 text-referra-500" />,
+          title: "Clients Awaiting Intake",
+          value: "17",
+          description: "📌 Needs Processing",
+          icon: <UserPlus className="h-5 w-5 text-referra-500" />,
           variant: 'default' as const
         },
         {
-          title: "Currently Onboarding",
-          value: "17",
-          description: "5 awaiting intake",
-          icon: <User className="h-5 w-5 text-amber-500" />,
+          title: "Clients with Active Referrals",
+          value: "32",
+          description: "🔄 Still in Progress",
+          icon: <RotateCw className="h-5 w-5 text-amber-500" />,
           variant: 'neutral' as const
-        }
-      ]
-    },
-    {
-      title: "Attention Required",
-      cards: [
+        },
         {
-          title: "Urgent Actions",
-          value: "5",
-          description: "Requires immediate attention",
-          icon: <AlertCircle className="h-5 w-5 text-red-500" />,
+          title: "Clients in Urgent Status",
+          value: "7",
+          description: "🚨 Requires Immediate Attention",
+          icon: <UserX className="h-5 w-5 text-red-500" />,
           variant: 'attention' as const
         }
       ]
@@ -117,17 +145,21 @@ export const MetricsOverview = () => {
 
   return (
     <div className="space-y-6">
+      {/* Action CTA Box */}
+      <div className="mb-2">
+        <ActionCTABox />
+      </div>
+      
+      {/* Metrics Categories */}
       {categories.map((category, idx) => (
         <div key={idx} className="space-y-4">
-          <h2 className="text-lg font-semibold flex items-center">
-            {category.title}
-            {category.title === "Attention Required" && (
-              <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                5
-              </span>
-            )}
-          </h2>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex items-baseline">
+            <h2 className="text-lg font-semibold">
+              {category.title}
+            </h2>
+            <span className="ml-2 text-xs text-gray-500">{category.description}</span>
+          </div>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {category.cards.map((card, cardIdx) => (
               <MetricCard
                 key={cardIdx}
