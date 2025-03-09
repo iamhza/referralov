@@ -1,11 +1,10 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, ArrowRight, List, MessageSquare, Bell, Settings } from 'lucide-react';
+import { Home, Users, ArrowRight, MessageSquare, Bell, Settings } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface TopNavigationProps {
   setShowMessages: (value: boolean) => void;
@@ -16,9 +15,10 @@ export const TopNavigation = ({ setShowMessages }: TopNavigationProps) => {
   
   const menuItems = [
     { title: "Dashboard", path: "/", icon: Home },
-    { title: "Clients", path: "/clients", icon: Users },
     { title: "Referrals", path: "/referrals", icon: ArrowRight },
-    { title: "Providers", path: "/providers", icon: List },
+    { title: "Matched Providers", path: "/matched-providers", icon: Users },
+    { title: "Clients", path: "/clients", icon: Users },
+    { title: "Settings", path: "/settings", icon: Settings },
   ];
 
   return (
@@ -41,12 +41,13 @@ export const TopNavigation = ({ setShowMessages }: TopNavigationProps) => {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                    "px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center",
                     location.pathname === item.path
                       ? "bg-gray-100 text-referra-600"
                       : "text-gray-700 hover:bg-gray-50 hover:text-referra-500"
                   )}
                 >
+                  <item.icon className="h-4 w-4 mr-2" />
                   {item.title}
                 </Link>
               ))}
@@ -63,9 +64,6 @@ export const TopNavigation = ({ setShowMessages }: TopNavigationProps) => {
             </button>
             <button className="p-2 hover:bg-gray-100 rounded-full">
               <Bell className="h-5 w-5 text-gray-500" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-full">
-              <Settings className="h-5 w-5 text-gray-500" />
             </button>
             <div className="border-l h-6 mx-2"></div>
             <div className="flex items-center gap-3">
