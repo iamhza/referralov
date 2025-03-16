@@ -36,8 +36,13 @@ export const ReferralForm = ({ onComplete }: ReferralFormProps) => {
         title: "Referral Submitted Successfully",
         description: "Your referral has been submitted and is being processed. You'll be redirected to provider matching.",
       });
+      
+      // Generate a random referral ID for the demo
+      const referralId = Math.floor(Math.random() * 10000).toString();
+      
+      // Update this to correctly navigate to the matched-providers route with the referral ID
       setTimeout(() => {
-        navigate('/providers');
+        navigate(`/matched-providers/${referralId}`);
       }, 1500);
     }
   };
