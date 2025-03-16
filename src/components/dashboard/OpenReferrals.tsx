@@ -112,11 +112,11 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
   
   const handleAction = () => {
     if (stage === 'matched') {
-      navigate(`/referrals/${id}/select-provider`);
+      navigate(`/matched-providers/${id}`);
     } else if (stage === 'active') {
-      navigate(`/referrals/${id}/track`);
+      navigate(`/referral-tracker/${id}`);
     } else if (stage === 'pending') {
-      navigate(`/referrals/${id}/details`);
+      navigate(`/referral-tracker/${id}`);
     }
   };
   
