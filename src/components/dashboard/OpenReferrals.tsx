@@ -24,7 +24,7 @@ const OpenReferrals = () => {
     {
       id: '1',
       clientName: 'John Smith',
-      service: 'Mental Health Counseling',
+      service: 'Adult rehabilitative mental health services (ARMHS)',
       urgency: 'high',
       timeInStage: '2 days',
       stage: 'matched',
@@ -33,7 +33,7 @@ const OpenReferrals = () => {
     {
       id: '2',
       clientName: 'Maria Garcia',
-      service: 'Housing Assistance',
+      service: 'Housing stabilization services (HSS)',
       urgency: 'medium',
       timeInStage: '1 day',
       stage: 'pending'
@@ -41,7 +41,7 @@ const OpenReferrals = () => {
     {
       id: '3',
       clientName: 'David Lee',
-      service: 'Substance Abuse Treatment',
+      service: 'Opioid treatment – non-residential',
       urgency: 'high',
       timeInStage: '3 days',
       stage: 'matched',
@@ -50,7 +50,7 @@ const OpenReferrals = () => {
     {
       id: '4',
       clientName: 'Sarah Johnson',
-      service: 'Family Therapy',
+      service: 'Family training',
       urgency: 'low',
       timeInStage: '5 days',
       stage: 'active'

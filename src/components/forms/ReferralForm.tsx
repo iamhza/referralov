@@ -15,6 +15,62 @@ import { CalendarIcon, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
+// List of all available services
+const AVAILABLE_SERVICES = [
+  "24-hour emergency assistance (waiver)",
+  "Adult companion services",
+  "Adult day services (ADS)",
+  "Adult rehabilitative mental health services (ARMHS)",
+  "Assisted living facility with dementia care",
+  "Basic home care license",
+  "Behavioral health home (BHH) services",
+  "Case management (waiver)",
+  "Certified community behavioral health clinic (CCBHC)",
+  "Chore services (waiver)",
+  "Community behavioral health hospital (CBHH)",
+  "Comprehensive home care license",
+  "Consumer-directed community supports (CDCS) support planner",
+  "Crisis respite",
+  "Customized living services",
+  "Day support services",
+  "Dental clinic",
+  "Employment services (waiver)",
+  "Environmental accessibility adaptations (EAA) home assessment",
+  "Environmental accessibility adaptations (EAA) home modification",
+  "Environmental accessibility adaptations (EAA) vehicle modification",
+  "Family residential services",
+  "Family training",
+  "Home-delivered meals",
+  "Homemaker services",
+  "Home safety",
+  "Housing stabilization services (HSS)",
+  "Independent living skills therapy (waiver)",
+  "Individual community living supports (ICLS)",
+  "Individualized home supports (IHS) with family training",
+  "Individualized home supports (IHS) without training",
+  "Individualized home supports (IHS) with training",
+  "Integrated community supports (ICS)",
+  "Job training",
+  "Medical equipment and supplies",
+  "Night supervision",
+  "Nursing home",
+  "Nursing home out of state",
+  "Nutrition services (waiver)",
+  "Opioid treatment – non-residential",
+  "Personal care assistant (PCA)",
+  "Personal emergency response system (PERS)",
+  "Positive support services",
+  "Prevocational services",
+  "Respite",
+  "Specialist services",
+  "Specialized equipment and supplies",
+  "Supervised living facility",
+  "Supportive housing",
+  "Transitional services",
+  "Transportation (waiver)",
+  "Vocational rehabilitation (VR) community partner"
+];
+
 interface ReferralFormProps {
   onComplete?: () => void;
 }
@@ -22,6 +78,7 @@ interface ReferralFormProps {
 export const ReferralForm = ({ onComplete }: ReferralFormProps) => {
   const [step, setStep] = useState(1);
   const [date, setDate] = useState<Date>();
+  const [selectedService, setSelectedService] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -40,7 +97,7 @@ export const ReferralForm = ({ onComplete }: ReferralFormProps) => {
       // Generate a random referral ID for the demo
       const referralId = Math.floor(Math.random() * 10000).toString();
       
-      // Update this to correctly navigate to the matched-providers route with the referral ID
+      // Navigate to the matched-providers route with the referral ID
       setTimeout(() => {
         navigate(`/matched-providers/${referralId}`);
       }, 1500);
@@ -52,6 +109,10 @@ export const ReferralForm = ({ onComplete }: ReferralFormProps) => {
       setStep(step - 1);
       window.scrollTo(0, 0);
     }
+  };
+  
+  const handleServiceChange = (value: string) => {
+    setSelectedService(value);
   };
   
   return (
@@ -85,21 +146,19 @@ export const ReferralForm = ({ onComplete }: ReferralFormProps) => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="service">What service is needed?</Label>
-                <Select defaultValue="mental-health">
+                <Select 
+                  value={selectedService} 
+                  onValueChange={handleServiceChange}
+                >
                   <SelectTrigger id="service">
                     <SelectValue placeholder="Select service" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mental-health">Mental Health Services</SelectItem>
-                    <SelectItem value="housing">Housing Assistance</SelectItem>
-                    <SelectItem value="healthcare">Healthcare Services</SelectItem>
-                    <SelectItem value="employment">Employment Support</SelectItem>
-                    <SelectItem value="education">Educational Resources</SelectItem>
-                    <SelectItem value="transportation">Transportation</SelectItem>
-                    <SelectItem value="legal">Legal Services</SelectItem>
-                    <SelectItem value="food">Food Assistance</SelectItem>
-                    <SelectItem value="substance">Substance Use Treatment</SelectItem>
-                    <SelectItem value="financial">Financial Support</SelectItem>
+                  <SelectContent className="max-h-[300px] overflow-y-auto">
+                    {AVAILABLE_SERVICES.map((service) => (
+                      <SelectItem key={service} value={service}>
+                        {service}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
