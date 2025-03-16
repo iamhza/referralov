@@ -7,6 +7,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import NewReferral from "./pages/NewReferral";
+import MatchedProviders from "./pages/MatchedProviders";
+import ReferralTracker from "./pages/ReferralTracker";
+import ProviderDashboard from "./pages/ProviderDashboard";
+import LandingPage from "./pages/LandingPage";
 
 const queryClient = new QueryClient();
 
@@ -18,12 +22,14 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/new-referral" element={<NewReferral />} />
+          <Route path="/matched-providers/:referralId" element={<MatchedProviders />} />
+          <Route path="/referral-tracker/:referralId" element={<ReferralTracker />} />
+          <Route path="/provider" element={<ProviderDashboard />} />
           <Route path="/pending-matches" element={<Index />} />
-          <Route path="/urgent-referrals" element={<Index />} />
-          <Route path="/clients/intake" element={<Index />} />
+          <Route path="/urgent-actions" element={<Index />} />
           <Route path="/active-referrals" element={<Index />} />
-          <Route path="/completed-referrals" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
