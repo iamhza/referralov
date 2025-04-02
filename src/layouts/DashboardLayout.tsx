@@ -16,7 +16,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { title: "Dashboard", path: "/", icon: Home },
     { title: "Clients", path: "/clients", icon: Users },
     { title: "Referrals", path: "/referrals", icon: ArrowRight },
-    { title: "Providers", path: "/matched-providers", icon: Users },
+    // Updated the path for Matched Providers to use the referrals route instead
+    { title: "Providers", path: "/referrals", icon: Users },
     { title: "Analytics", path: "/analytics", icon: BarChart3 },
     { title: "Settings", path: "/settings", icon: Settings },
     { title: "Help & Support", path: "/support", icon: HelpCircle },
