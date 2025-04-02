@@ -16,8 +16,6 @@ export const TopNavigation = ({ setShowMessages }: TopNavigationProps) => {
   const menuItems = [
     { title: "Dashboard", path: "/", icon: Home },
     { title: "Referrals", path: "/referrals", icon: ArrowRight },
-    // Updated to point to referrals instead of matched-providers
-    { title: "Matched Providers", path: "/referrals", icon: Users },
     { title: "Clients", path: "/clients", icon: Users },
     { title: "Settings", path: "/settings", icon: Settings },
   ];
