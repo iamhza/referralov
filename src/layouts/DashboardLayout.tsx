@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Home, Users, ArrowRight, List } from 'lucide-react';
+import { Home, Users, ArrowRight, List, BarChart3, Settings, HelpCircle } from 'lucide-react';
 import { TopNavigation } from '@/components/navigation/TopNavigation';
 import { MobileNavigation } from '@/components/navigation/MobileNavigation';
 import { MessageButton, MessagePanel } from '@/components/messages/MessagePanel';
@@ -16,7 +16,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { title: "Dashboard", path: "/", icon: Home },
     { title: "Clients", path: "/clients", icon: Users },
     { title: "Referrals", path: "/referrals", icon: ArrowRight },
-    { title: "Providers", path: "/providers", icon: List },
+    { title: "Providers", path: "/providers", icon: Users },
+    { title: "Analytics", path: "/analytics", icon: BarChart3 },
+    { title: "Settings", path: "/settings", icon: Settings },
+    { title: "Help & Support", path: "/support", icon: HelpCircle },
   ];
 
   return (
