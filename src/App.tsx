@@ -12,6 +12,7 @@ import ReferralTracker from "./pages/ReferralTracker";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import LandingPage from "./pages/LandingPage";
 import Referrals from "./pages/Referrals";
+import Clients from "./pages/Clients";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/referral-tracker/:referralId" element={<ReferralTracker />} />
           <Route path="/provider" element={<ProviderDashboard />} />
           <Route path="/referrals" element={<Referrals />} />
+          <Route path="/clients" element={<Clients />} />
           <Route path="/pending-matches" element={<Referrals />} />
           <Route path="/urgent-actions" element={<Referrals />} />
           <Route path="/active-referrals" element={<Referrals />} />
