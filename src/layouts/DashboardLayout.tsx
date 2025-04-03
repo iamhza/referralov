@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Home, Users, ArrowRight, List, BarChart3, Settings, HelpCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, Users, ArrowRight, BarChart3, Settings, HelpCircle } from 'lucide-react';
 import { TopNavigation } from '@/components/navigation/TopNavigation';
 import { MobileNavigation } from '@/components/navigation/MobileNavigation';
 import { MessageButton, MessagePanel } from '@/components/messages/MessagePanel';

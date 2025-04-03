@@ -25,7 +25,7 @@ export const messageService = {
         return [];
       }
 
-      return data as Message[];
+      return data as unknown as Message[];
     } catch (error) {
       console.error("Unexpected error in getMessages:", error);
       return [];
@@ -70,7 +70,7 @@ export const messageService = {
         return null;
       }
 
-      return data as Message;
+      return data as unknown as Message;
     } catch (error) {
       console.error("Unexpected error in sendMessage:", error);
       return null;

@@ -107,7 +107,7 @@ export function useMessages(referralId?: number) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload) => {
-          const newMessage = payload.new as Message;
+          const newMessage = payload.new as unknown as Message;
           
           // Only add the message if it's for the current referral
           if (referralId && newMessage.referral_id === referralId) {

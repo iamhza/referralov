@@ -16,6 +16,7 @@ interface MessageFormValues {
   content: string;
 }
 
+// MessageButton component
 export const MessageButton = ({ showMessages, setShowMessages, unreadCount }: MessagePanelProps & { unreadCount: number }) => (
   <div 
     className={`fixed bottom-6 right-6 z-50 transition-all duration-300 animate-fade-in ${showMessages ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
@@ -35,6 +36,7 @@ export const MessageButton = ({ showMessages, setShowMessages, unreadCount }: Me
   </div>
 );
 
+// MessagePanel component
 export const MessagePanel = ({ showMessages, setShowMessages }: MessagePanelProps) => {
   // We're using referral_id 1001 as an example - in a real app, this would be dynamic
   const { messages, isLoading, sendMessage, markMessagesAsRead } = useMessages(1001);
@@ -166,6 +168,3 @@ export const MessagePanel = ({ showMessages, setShowMessages }: MessagePanelProp
     </div>
   );
 };
-
-// Export the updated components - note that MessageButton now expects an unreadCount prop
-export { MessagePanel, MessageButton };
