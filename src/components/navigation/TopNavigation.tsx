@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button';
 
 interface TopNavigationProps {
   setShowMessages: (value: boolean) => void;
+  unreadCount: number;
 }
 
-export const TopNavigation = ({ setShowMessages }: TopNavigationProps) => {
+export const TopNavigation = ({ setShowMessages, unreadCount }: TopNavigationProps) => {
   const location = useLocation();
   
   const menuItems = [
@@ -59,7 +60,11 @@ export const TopNavigation = ({ setShowMessages }: TopNavigationProps) => {
               className="p-2 hover:bg-gray-100 rounded-full relative"
             >
               <MessageSquare className="h-5 w-5 text-gray-500" />
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">2</span>
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
             <button className="p-2 hover:bg-gray-100 rounded-full">
               <Bell className="h-5 w-5 text-gray-500" />

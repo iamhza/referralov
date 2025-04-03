@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, Users, ArrowRight, List, BarChart3, Settings, HelpCircle } from 'lucide-react';
 import { TopNavigation } from '@/components/navigation/TopNavigation';
 import { MobileNavigation } from '@/components/navigation/MobileNavigation';
 import { MessageButton, MessagePanel } from '@/components/messages/MessagePanel';
+import { useMessages } from '@/hooks/useMessages';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -11,7 +12,8 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [showMessages, setShowMessages] = useState(false);
-
+  const { unreadCount } = useMessages();
+  
   const menuItems = [
     { title: "Dashboard", path: "/", icon: Home },
     { title: "Clients", path: "/clients", icon: Users },
@@ -24,7 +26,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Top Navigation */}
-      <TopNavigation setShowMessages={setShowMessages} />
+      <TopNavigation setShowMessages={setShowMessages} unreadCount={unreadCount} />
       
       {/* Mobile menu button */}
       <MobileNavigation menuItems={menuItems} />
@@ -37,7 +39,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </main>
       
       {/* Messaging UI */}
-      <MessageButton showMessages={showMessages} setShowMessages={setShowMessages} />
+      <MessageButton showMessages={showMessages} setShowMessages={setShowMessages} unreadCount={unreadCount} />
       <MessagePanel showMessages={showMessages} setShowMessages={setShowMessages} />
     </div>
   );
