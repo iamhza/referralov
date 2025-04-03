@@ -14,6 +14,13 @@ export interface ClientData {
   id: string;
   name: string;
   status: 'active' | 'pending' | 'completed' | 'urgent';
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipcode?: string;
+  notes?: string;
   activeReferrals: number;
   lastUpdated: string;
 }
@@ -83,6 +90,106 @@ export const awsApiClient = {
       return { success: true, data };
     } catch (error) {
       console.error(`Failed to fetch client ${id}:`, error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error occurred" 
+      };
+    }
+  },
+
+  /**
+   * Create a new client
+   */
+  async createClient(clientData: Omit<ClientData, 'id' | 'lastUpdated' | 'activeReferrals'>): Promise<ApiResponse<ClientData>> {
+    try {
+      if (!API_URL) {
+        console.error("AWS API URL not configured");
+        return { success: false, error: "API URL not configured" };
+      }
+      
+      const response = await fetch(`${API_URL}/clients`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          // Add authentication headers here
+        },
+        body: JSON.stringify(clientData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error) {
+      console.error("Failed to create client:", error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error occurred" 
+      };
+    }
+  },
+
+  /**
+   * Update an existing client
+   */
+  async updateClient(id: string, clientData: Partial<ClientData>): Promise<ApiResponse<ClientData>> {
+    try {
+      if (!API_URL) {
+        console.error("AWS API URL not configured");
+        return { success: false, error: "API URL not configured" };
+      }
+      
+      const response = await fetch(`${API_URL}/clients/${id}`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json",
+          // Add authentication headers here
+        },
+        body: JSON.stringify(clientData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error) {
+      console.error(`Failed to update client ${id}:`, error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error occurred" 
+      };
+    }
+  },
+
+  /**
+   * Delete a client
+   */
+  async deleteClient(id: string): Promise<ApiResponse<void>> {
+    try {
+      if (!API_URL) {
+        console.error("AWS API URL not configured");
+        return { success: false, error: "API URL not configured" };
+      }
+      
+      const response = await fetch(`${API_URL}/clients/${id}`, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json",
+          // Add authentication headers here
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error(`Failed to delete client ${id}:`, error);
       return { 
         success: false, 
         error: error instanceof Error ? error.message : "Unknown error occurred" 
