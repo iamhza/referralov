@@ -151,7 +151,7 @@ export const awsApiClient = {
     insuranceType: "Medicaid",
     medicalNotes: "Asthma",
     urgency: "high",
-    culturalNeeds: "Halal meals",
+    culturalNeeds: ["Halal meals"], // ✅ correctly formatted array
     languagePreferences: ["Somali", "English"]
   }): Promise<ApiResponse<any>> {
     const testEndpoint = "https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData";
