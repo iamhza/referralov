@@ -4,12 +4,20 @@ import { awsApiClient } from '@/services/awsApiClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+
+const SAMPLE_PAYLOAD = {
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "1234567890"
+};
 
 export function ApiTester() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{ success: boolean; data?: any; error?: string } | null>(null);
+  const [payload, setPayload] = useState(JSON.stringify(SAMPLE_PAYLOAD, null, 2));
   
   const testApi = async () => {
     setIsLoading(true);
@@ -17,7 +25,21 @@ export function ApiTester() {
     
     try {
       console.log("Testing API endpoint...");
-      const response = await awsApiClient.testApiEndpoint();
+      let parsedPayload;
+      
+      try {
+        parsedPayload = JSON.parse(payload);
+      } catch (e) {
+        toast({
+          title: "Invalid JSON",
+          description: "Please check your payload format",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      const response = await awsApiClient.testApiEndpoint(parsedPayload);
       console.log("API response:", response);
       setResult(response);
       
@@ -44,13 +66,17 @@ export function ApiTester() {
       setIsLoading(false);
     }
   };
+
+  const handlePayloadChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPayload(e.target.value);
+  };
   
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>API Endpoint Tester</CardTitle>
         <CardDescription>
-          Test your AWS API Gateway endpoint with sample client data
+          Test your AWS API Gateway endpoint with customizable client data
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -60,21 +86,20 @@ export function ApiTester() {
             <p className="break-all text-sm">https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData</p>
             
             <h3 className="font-semibold mt-4 mb-2">Test Payload:</h3>
-            <pre className="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-auto">
-              {JSON.stringify({
-                "first_name": "John",
-                "last_name": "Doe",
-                "email": "john.doe@example.com",
-                "phone": "1234567890"
-              }, null, 2)}
-            </pre>
+            <textarea 
+              className="font-mono w-full h-40 p-4 bg-gray-800 text-green-400 rounded text-sm"
+              value={payload}
+              onChange={handlePayloadChange}
+            />
             
             <h3 className="font-semibold mt-4 mb-2">Common Issues:</h3>
             <ul className="list-disc pl-5 text-sm space-y-1">
-              <li>CORS policies may be preventing the request</li>
-              <li>API Gateway might not have CORS enabled</li>
-              <li>API key might be required but not provided</li>
-              <li>Network connectivity issues</li>
+              <li>500 Internal Server Error often means the Lambda function is failing</li>
+              <li>Check your Lambda function logs in AWS CloudWatch</li>
+              <li>The Lambda might have issues with the payload format</li>
+              <li>Endpoint might require specific payload structure</li>
+              <li>API Gateway might need better error handling</li>
+              <li>Try simplifying the payload to find what works</li>
             </ul>
           </div>
 
@@ -94,13 +119,18 @@ export function ApiTester() {
           )}
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col space-y-2">
         <Button 
           onClick={testApi} 
           disabled={isLoading}
           className="w-full"
         >
-          {isLoading ? "Testing..." : "Test API Endpoint"}
+          {isLoading ? (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              Testing...
+            </>
+          ) : "Test API Endpoint"}
         </Button>
       </CardFooter>
     </Card>

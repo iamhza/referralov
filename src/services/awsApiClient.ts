@@ -136,17 +136,15 @@ export const awsApiClient = {
   },
   
   /**
-   * Test the AWS API with sample client data
+   * Test the AWS API with customizable client data
    */
-  async testApiEndpoint(): Promise<ApiResponse<any>> {
+  async testApiEndpoint(payload = {
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "phone": "1234567890"
+  }): Promise<ApiResponse<any>> {
     const testEndpoint = "https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData";
-    const testData = {
-      "first_name": "John",
-      "last_name": "Doe",
-      "email": "john.doe@example.com",
-      "phone": "1234567890"
-    };
-    
-    return await makeApiRequest<any>(testEndpoint, 'POST', testData);
+    return await makeApiRequest<any>(testEndpoint, 'POST', payload);
   }
 };
