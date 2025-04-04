@@ -33,6 +33,8 @@ export interface ClientData {
   organization?: string;
   activeReferrals: number;
   lastUpdated: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 /**
@@ -44,7 +46,7 @@ async function makeApiRequest<T>(
   body?: any
 ): Promise<ApiResponse<T>> {
   try {
-    if (!API_URL) {
+    if (!API_URL && !endpoint.startsWith('http')) {
       console.error("AWS API URL not configured");
       return { success: false, error: "API URL not configured. Please add VITE_AWS_API_URL to your environment." };
     }
@@ -70,7 +72,10 @@ async function makeApiRequest<T>(
     }
     
     // Make the API request
-    const response = await fetch(`${API_URL}${endpoint}`, requestOptions);
+    const url = endpoint.startsWith('http') ? endpoint : `${API_URL}${endpoint}`;
+    console.log(`Making ${method} request to: ${url}`);
+    
+    const response = await fetch(url, requestOptions);
     
     // Handle HTTP errors
     if (!response.ok) {
@@ -127,5 +132,20 @@ export const awsApiClient = {
    */
   async deleteClient(id: string): Promise<ApiResponse<void>> {
     return await makeApiRequest<void>(`/clients/${id}`, 'DELETE');
+  },
+  
+  /**
+   * Test the AWS API with sample client data
+   */
+  async testApiEndpoint(): Promise<ApiResponse<any>> {
+    const testEndpoint = "https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData";
+    const testData = {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "1234567890"
+    };
+    
+    return await makeApiRequest<any>(testEndpoint, 'POST', testData);
   }
 };
