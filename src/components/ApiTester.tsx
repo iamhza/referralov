@@ -19,7 +19,7 @@ const SAMPLE_PAYLOAD = {
   insuranceType: "Medicaid",
   medicalNotes: "Asthma",
   urgency: "high",
-  culturalNeeds: "Halal meals",
+  culturalNeeds: ["Halal meals"], // Corrected to always be an array
   languagePreferences: ["Somali", "English"]
   // serviceId and caseManagerId left out for now
 };
@@ -40,6 +40,12 @@ export function ApiTester() {
       
       try {
         parsedPayload = JSON.parse(payload);
+        
+        // Ensure culturalNeeds is an array
+        if (parsedPayload.culturalNeeds && !Array.isArray(parsedPayload.culturalNeeds)) {
+          parsedPayload.culturalNeeds = [parsedPayload.culturalNeeds];
+        }
+        
       } catch (e) {
         toast({
           title: "Invalid JSON",
@@ -110,6 +116,7 @@ export function ApiTester() {
               <li>The Lambda might have issues with the payload format</li>
               <li>Make sure the payload includes the "name" field as it appears to be required</li>
               <li>Check if any required fields are missing in the database schema</li>
+              <li>Field types must match the database schema (e.g., culturalNeeds must be an array)</li>
               <li>API Gateway might need better error handling</li>
             </ul>
           </div>

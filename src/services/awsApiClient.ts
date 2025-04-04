@@ -26,7 +26,7 @@ export interface ClientData {
   medicalNotes?: string;
   serviceId?: string;
   urgency?: 'low' | 'medium' | 'high' | 'critical';
-  culturalNeeds?: string | string[];
+  culturalNeeds?: string[] | string;
   languagePreferences?: string[];
   caseManagerId?: string;
   caseManagerName?: string;
@@ -69,6 +69,18 @@ async function makeApiRequest<T>(
 
     // Add body for non-GET requests
     if (body && method !== 'GET') {
+      // Ensure array fields are properly formatted
+      if (body.culturalNeeds && typeof body.culturalNeeds === 'string') {
+        body.culturalNeeds = [body.culturalNeeds];
+      }
+      
+      // Format other potential array fields if needed
+      ['accessibilityNeeds', 'languagePreferences'].forEach(field => {
+        if (body[field] && !Array.isArray(body[field])) {
+          body[field] = [body[field]];
+        }
+      });
+      
       requestOptions.body = JSON.stringify(body);
     }
     
@@ -151,7 +163,7 @@ export const awsApiClient = {
     insuranceType: "Medicaid",
     medicalNotes: "Asthma",
     urgency: "high",
-    culturalNeeds: ["Halal meals"], // ✅ correctly formatted array
+    culturalNeeds: ["Halal meals"], // Corrected to be an array
     languagePreferences: ["Somali", "English"]
   }): Promise<ApiResponse<any>> {
     const testEndpoint = "https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData";
