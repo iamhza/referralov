@@ -1,13 +1,13 @@
 
 import React from 'react';
 import DashboardLayout from '@/layouts/DashboardLayout';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { MetricsOverview } from '@/components/dashboard/MetricsOverview';
-import { OpenReferrals } from '@/components/dashboard/OpenReferrals';
-import { ReferralPipeline } from '@/components/dashboard/ReferralPipeline';
-import { PriorityMetrics } from '@/components/dashboard/PriorityMetrics';
+import OpenReferrals from '@/components/dashboard/OpenReferrals';
+import ReferralPipeline from '@/components/dashboard/ReferralPipeline';
+import PriorityMetrics from '@/components/dashboard/PriorityMetrics';
 import { ClientTable } from '@/components/dashboard/ClientTable';
-import { ActionPanel } from '@/components/dashboard/ActionPanel';
+import ActionPanel from '@/components/dashboard/ActionPanel';
 import { FeaturedProviders } from '@/components/dashboard/FeaturedProviders';
 import { ApiTester } from '@/components/ApiTester';
 
