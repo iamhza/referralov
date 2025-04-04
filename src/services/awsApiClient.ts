@@ -1,8 +1,7 @@
 
-import { toast } from "@/components/ui/use-toast";
-
 // AWS API configuration
 const API_URL = import.meta.env.VITE_AWS_API_URL || "";
+const API_KEY = import.meta.env.VITE_AWS_API_KEY || "";
 
 interface ApiResponse<T> {
   success: boolean;
@@ -21,179 +20,112 @@ export interface ClientData {
   state?: string;
   zipcode?: string;
   notes?: string;
+  dateOfBirth?: string;
+  accessibilityNeeds?: string[];
+  insuranceType?: string;
+  medicalNotes?: string;
+  serviceId?: string;
+  urgency?: 'low' | 'medium' | 'high' | 'critical';
+  culturalNeeds?: string;
+  languagePreferences?: string[];
+  caseManagerId?: string;
+  caseManagerName?: string;
+  organization?: string;
   activeReferrals: number;
   lastUpdated: string;
 }
 
 /**
- * AWS API client service for making authenticated requests
+ * Helper function to make authenticated requests to the AWS API Gateway
+ */
+async function makeApiRequest<T>(
+  endpoint: string, 
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET', 
+  body?: any
+): Promise<ApiResponse<T>> {
+  try {
+    if (!API_URL) {
+      console.error("AWS API URL not configured");
+      return { success: false, error: "API URL not configured. Please add VITE_AWS_API_URL to your environment." };
+    }
+    
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+    
+    // Add API key if available
+    if (API_KEY) {
+      headers["x-api-key"] = API_KEY;
+    }
+
+    const requestOptions: RequestInit = {
+      method,
+      headers,
+      credentials: 'include', // Include cookies for sessions if used
+    };
+
+    // Add body for non-GET requests
+    if (body && method !== 'GET') {
+      requestOptions.body = JSON.stringify(body);
+    }
+    
+    // Make the API request
+    const response = await fetch(`${API_URL}${endpoint}`, requestOptions);
+    
+    // Handle HTTP errors
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API error: ${response.status} - ${errorText}`);
+    }
+    
+    // Parse the response as JSON
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error(`API request failed: ${error}`);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error occurred" 
+    };
+  }
+}
+
+/**
+ * AWS API client service for making authenticated requests to API Gateway
  */
 export const awsApiClient = {
   /**
    * Fetch clients from AWS API
    */
   async getClients(): Promise<ApiResponse<ClientData[]>> {
-    try {
-      if (!API_URL) {
-        console.error("AWS API URL not configured");
-        return { success: false, error: "API URL not configured. Please add VITE_AWS_API_URL to your environment." };
-      }
-      
-      // In a real implementation, you would add your AWS authentication headers here
-      // This could be AWS Signature V4 signing or using an API key
-      const response = await fetch(`${API_URL}/clients`, {
-        headers: {
-          // Example headers - replace with your actual auth method
-          "Content-Type": "application/json",
-          // "x-api-key": apiKey, 
-          // OR use AWS Signature V4 authentication
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return { success: true, data };
-    } catch (error) {
-      console.error("Failed to fetch clients:", error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error occurred" 
-      };
-    }
+    return await makeApiRequest<ClientData[]>('/clients');
   },
 
   /**
    * Get a single client by ID
    */
   async getClient(id: string): Promise<ApiResponse<ClientData>> {
-    try {
-      if (!API_URL) {
-        console.error("AWS API URL not configured");
-        return { success: false, error: "API URL not configured" };
-      }
-      
-      const response = await fetch(`${API_URL}/clients/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          // Add authentication headers here
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return { success: true, data };
-    } catch (error) {
-      console.error(`Failed to fetch client ${id}:`, error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error occurred" 
-      };
-    }
+    return await makeApiRequest<ClientData>(`/clients/${id}`);
   },
 
   /**
    * Create a new client
    */
   async createClient(clientData: Omit<ClientData, 'id' | 'lastUpdated' | 'activeReferrals'>): Promise<ApiResponse<ClientData>> {
-    try {
-      if (!API_URL) {
-        console.error("AWS API URL not configured");
-        return { success: false, error: "API URL not configured" };
-      }
-      
-      const response = await fetch(`${API_URL}/clients`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          // Add authentication headers here
-        },
-        body: JSON.stringify(clientData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return { success: true, data };
-    } catch (error) {
-      console.error("Failed to create client:", error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error occurred" 
-      };
-    }
+    return await makeApiRequest<ClientData>('/clients', 'POST', clientData);
   },
 
   /**
    * Update an existing client
    */
   async updateClient(id: string, clientData: Partial<ClientData>): Promise<ApiResponse<ClientData>> {
-    try {
-      if (!API_URL) {
-        console.error("AWS API URL not configured");
-        return { success: false, error: "API URL not configured" };
-      }
-      
-      const response = await fetch(`${API_URL}/clients/${id}`, {
-        method: 'PUT',
-        headers: {
-          "Content-Type": "application/json",
-          // Add authentication headers here
-        },
-        body: JSON.stringify(clientData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return { success: true, data };
-    } catch (error) {
-      console.error(`Failed to update client ${id}:`, error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error occurred" 
-      };
-    }
+    return await makeApiRequest<ClientData>(`/clients/${id}`, 'PUT', clientData);
   },
 
   /**
    * Delete a client
    */
   async deleteClient(id: string): Promise<ApiResponse<void>> {
-    try {
-      if (!API_URL) {
-        console.error("AWS API URL not configured");
-        return { success: false, error: "API URL not configured" };
-      }
-      
-      const response = await fetch(`${API_URL}/clients/${id}`, {
-        method: 'DELETE',
-        headers: {
-          "Content-Type": "application/json",
-          // Add authentication headers here
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      return { success: true };
-    } catch (error) {
-      console.error(`Failed to delete client ${id}:`, error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error occurred" 
-      };
-    }
+    return await makeApiRequest<void>(`/clients/${id}`, 'DELETE');
   }
 };

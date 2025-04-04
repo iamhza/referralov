@@ -31,8 +31,11 @@ export function useClientData() {
       
       return response.data || [];
     },
+    // Only attempt to fetch if API_URL is configured
+    enabled: Boolean(import.meta.env.VITE_AWS_API_URL),
   });
 
+  // Fetch a single client by ID
   const getClient = async (id: string): Promise<ClientData | null> => {
     const response = await awsApiClient.getClient(id);
     

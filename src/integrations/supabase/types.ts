@@ -208,7 +208,7 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
-            referencedColumns: ["id"]
+            referencedColumns: ["service_id"]
           },
         ]
       }
@@ -437,20 +437,20 @@ export type Database = {
       services: {
         Row: {
           created_at: string | null
-          id: string
           name: string
+          service_id: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
-          id?: string
           name: string
+          service_id?: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
-          id?: string
           name?: string
+          service_id?: string
           updated_at?: string | null
         }
         Relationships: []
