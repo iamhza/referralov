@@ -1,4 +1,3 @@
-
 // AWS API configuration
 const API_URL = import.meta.env.VITE_AWS_API_URL || "";
 const API_KEY = import.meta.env.VITE_AWS_API_KEY || "";
@@ -124,6 +123,15 @@ export const awsApiClient = {
    */
   async getClient(id: string): Promise<ApiResponse<ClientData>> {
     return await makeApiRequest<ClientData>(`/clients/${id}`);
+  },
+
+  /**
+   * Get a client by the ID returned from test insertion
+   * This is specific to the test API endpoint
+   */
+  async getTestClient(id: string): Promise<ApiResponse<ClientData>> {
+    const testEndpoint = `https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/getClientData?id=${id}`;
+    return await makeApiRequest<ClientData>(testEndpoint);
   },
 
   /**
