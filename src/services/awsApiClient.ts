@@ -63,7 +63,8 @@ async function makeApiRequest<T>(
     const requestOptions: RequestInit = {
       method,
       headers,
-      credentials: 'include', // Include cookies for sessions if used
+      credentials: 'omit', // Changed from 'include' to 'omit' for CORS
+      mode: 'cors', // Explicitly set CORS mode
     };
 
     // Add body for non-GET requests

@@ -4,6 +4,7 @@ import { awsApiClient } from '@/services/awsApiClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 export function ApiTester() {
   const { toast } = useToast();
@@ -67,11 +68,25 @@ export function ApiTester() {
                 "phone": "1234567890"
               }, null, 2)}
             </pre>
+            
+            <h3 className="font-semibold mt-4 mb-2">Common Issues:</h3>
+            <ul className="list-disc pl-5 text-sm space-y-1">
+              <li>CORS policies may be preventing the request</li>
+              <li>API Gateway might not have CORS enabled</li>
+              <li>API key might be required but not provided</li>
+              <li>Network connectivity issues</li>
+            </ul>
           </div>
 
           {result && (
             <div className={`p-4 rounded-md ${result.success ? 'bg-green-50' : 'bg-red-50'}`}>
-              <h3 className="font-semibold mb-2">Response:</h3>
+              <div className="flex items-center mb-2">
+                {result.success ? 
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2" /> : 
+                  <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+                }
+                <h3 className="font-semibold">Response:</h3>
+              </div>
               <pre className={`p-4 rounded text-sm overflow-auto ${result.success ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'}`}>
                 {JSON.stringify(result, null, 2)}
               </pre>
