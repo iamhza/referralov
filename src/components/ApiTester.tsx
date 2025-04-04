@@ -7,10 +7,21 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 
 const SAMPLE_PAYLOAD = {
-  "first_name": "John",
-  "last_name": "Doe",
-  "email": "john.doe@example.com",
-  "phone": "1234567890"
+  name: "Jane Doe",
+  dateOfBirth: "1990-01-01",
+  email: "jane@example.com",
+  phone: "123-456-7890",
+  address: "123 Main St",
+  city: "Minneapolis",
+  state: "MN",
+  zipcode: "55401",
+  accessibilityNeeds: ["Wheelchair"],
+  insuranceType: "Medicaid",
+  medicalNotes: "Asthma",
+  urgency: "high",
+  culturalNeeds: "Halal meals",
+  languagePreferences: ["Somali", "English"]
+  // serviceId and caseManagerId left out for now
 };
 
 export function ApiTester() {
@@ -97,9 +108,9 @@ export function ApiTester() {
               <li>500 Internal Server Error often means the Lambda function is failing</li>
               <li>Check your Lambda function logs in AWS CloudWatch</li>
               <li>The Lambda might have issues with the payload format</li>
-              <li>Endpoint might require specific payload structure</li>
+              <li>Make sure the payload includes the "name" field as it appears to be required</li>
+              <li>Check if any required fields are missing in the database schema</li>
               <li>API Gateway might need better error handling</li>
-              <li>Try simplifying the payload to find what works</li>
             </ul>
           </div>
 

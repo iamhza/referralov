@@ -26,7 +26,7 @@ export interface ClientData {
   medicalNotes?: string;
   serviceId?: string;
   urgency?: 'low' | 'medium' | 'high' | 'critical';
-  culturalNeeds?: string;
+  culturalNeeds?: string | string[];
   languagePreferences?: string[];
   caseManagerId?: string;
   caseManagerName?: string;
@@ -139,10 +139,20 @@ export const awsApiClient = {
    * Test the AWS API with customizable client data
    */
   async testApiEndpoint(payload = {
-    "first_name": "John",
-    "last_name": "Doe",
-    "email": "john.doe@example.com",
-    "phone": "1234567890"
+    name: "Jane Doe",
+    dateOfBirth: "1990-01-01",
+    email: "jane@example.com",
+    phone: "123-456-7890",
+    address: "123 Main St",
+    city: "Minneapolis",
+    state: "MN",
+    zipcode: "55401",
+    accessibilityNeeds: ["Wheelchair"],
+    insuranceType: "Medicaid",
+    medicalNotes: "Asthma",
+    urgency: "high",
+    culturalNeeds: "Halal meals",
+    languagePreferences: ["Somali", "English"]
   }): Promise<ApiResponse<any>> {
     const testEndpoint = "https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData";
     return await makeApiRequest<any>(testEndpoint, 'POST', payload);
