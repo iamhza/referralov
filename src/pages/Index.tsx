@@ -6,7 +6,6 @@ import { MetricsOverview } from '@/components/dashboard/MetricsOverview';
 import OpenReferrals from '@/components/dashboard/OpenReferrals';
 import ReferralPipeline from '@/components/dashboard/ReferralPipeline';
 import PriorityMetrics from '@/components/dashboard/PriorityMetrics';
-import { ClientTable } from '@/components/dashboard/ClientTable';
 import ActionPanel from '@/components/dashboard/ActionPanel';
 import { FeaturedProviders } from '@/components/dashboard/FeaturedProviders';
 
@@ -26,10 +25,10 @@ const Index = () => {
         {/* Open Referrals Section */}
         <OpenReferrals />
         
-        {/* Clients & Actions Section */}
+        {/* Actions & Providers Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <ClientTable />
+            <OpenReferrals title="Recent Referrals" />
           </div>
           <div>
             <ActionPanel />

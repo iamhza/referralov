@@ -21,6 +21,7 @@ import MatchedProviders from "./pages/case-manager/MatchedProviders";
 // Provider pages
 import ProviderDashboard from "./pages/provider/Dashboard";
 import ProviderReferrals from "./pages/provider/Referrals";
+import ProviderReferralTracker from "./pages/provider/ReferralTracker";
 
 const queryClient = new QueryClient();
 
@@ -46,7 +47,7 @@ const App = () => (
           {/* Provider routes */}
           <Route path="/provider" element={<ProviderDashboard />} />
           <Route path="/provider/referrals" element={<ProviderReferrals />} />
-          <Route path="/provider/referral-tracker/:referralId" element={<ReferralTracker />} />
+          <Route path="/provider/referral-tracker/:referralId" element={<ProviderReferralTracker />} />
           
           {/* Redirect old routes to new structured routes */}
           <Route path="/referrals" element={<Navigate to="/case-manager/referrals" replace />} />
