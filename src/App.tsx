@@ -15,7 +15,6 @@ import SignUp from "./pages/auth/SignUp";
 import CaseManagerDashboard from "./pages/case-manager/Dashboard";
 import NewReferral from "./pages/case-manager/NewReferral";
 import Referrals from "./pages/case-manager/Referrals";
-import Clients from "./pages/case-manager/Clients";
 import ReferralTracker from "./pages/case-manager/ReferralTracker";
 import MatchedProviders from "./pages/case-manager/MatchedProviders";
 
@@ -41,7 +40,6 @@ const App = () => (
           <Route path="/case-manager" element={<CaseManagerDashboard />} />
           <Route path="/case-manager/new-referral" element={<NewReferral />} />
           <Route path="/case-manager/referrals" element={<Referrals />} />
-          <Route path="/case-manager/clients" element={<Clients />} />
           <Route path="/case-manager/matched-providers/:referralId" element={<MatchedProviders />} />
           <Route path="/case-manager/referral-tracker/:referralId" element={<ReferralTracker />} />
           
@@ -51,7 +49,6 @@ const App = () => (
           
           {/* Redirect old routes to new structured routes */}
           <Route path="/referrals" element={<Navigate to="/case-manager/referrals" replace />} />
-          <Route path="/clients" element={<Navigate to="/case-manager/clients" replace />} />
           <Route path="/new-referral" element={<Navigate to="/case-manager/new-referral" replace />} />
           <Route path="/matched-providers/:referralId" element={<Navigate to="/case-manager/matched-providers/:referralId" replace />} />
           <Route path="/referral-tracker/:referralId" element={<Navigate to="/case-manager/referral-tracker/:referralId" replace />} />

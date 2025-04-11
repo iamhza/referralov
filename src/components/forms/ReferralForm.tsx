@@ -11,9 +11,10 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
+import { CalendarIcon, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 // List of all available services
 const AVAILABLE_SERVICES = [
@@ -82,7 +83,7 @@ const ReferralForm = ({ onComplete }: ReferralFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const totalSteps = 4;
+  const totalSteps = 3;
   
   const nextStep = () => {
     if (step < totalSteps) {
@@ -140,7 +141,7 @@ const ReferralForm = ({ onComplete }: ReferralFormProps) => {
                 Step 1
               </div>
               <h3 className="text-lg font-semibold">Service Request Basics</h3>
-              <p className="text-gray-500 mt-1">Tell us what service you need for your client</p>
+              <p className="text-gray-500 mt-1">Tell us what service you're looking for</p>
             </div>
             
             <div className="space-y-6">
@@ -207,167 +208,44 @@ const ReferralForm = ({ onComplete }: ReferralFormProps) => {
                   </PopoverContent>
                 </Popover>
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="counties">Counties to be served</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select county" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hennepin">Hennepin</SelectItem>
+                    <SelectItem value="ramsey">Ramsey</SelectItem>
+                    <SelectItem value="dakota">Dakota</SelectItem>
+                    <SelectItem value="anoka">Anoka</SelectItem>
+                    <SelectItem value="washington">Washington</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="notes">Additional Notes</Label>
+                <Textarea 
+                  id="notes" 
+                  placeholder="Any additional details about the service request..."
+                  className="min-h-[100px]"
+                />
+              </div>
             </div>
           </div>
         )}
         
-        {/* Step 2: Client Information & Demographics */}
+        {/* Step 2: Provider Matching Preferences */}
         {step === 2 && (
           <div className="animate-fade-in">
             <div className="mb-8">
               <div className="bg-referra-50 text-referra-700 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-2">
                 Step 2
               </div>
-              <h3 className="text-lg font-semibold">Client Information & Demographics</h3>
-              <p className="text-gray-500 mt-1">Details needed to match with appropriate providers</p>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="clientName">Client Full Name</Label>
-                  <Input id="clientName" defaultValue="Maria Johnson" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Date of Birth</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !date && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : <span>Pick a date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Gender Preference for Provider?</Label>
-                <RadioGroup defaultValue="no-preference" className="flex flex-wrap gap-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no-preference" id="no-preference" />
-                    <Label htmlFor="no-preference">No Preference</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="male" id="male" />
-                    <Label htmlFor="male">Male</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="female" id="female" />
-                    <Label htmlFor="female">Female</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Language Preferences</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                  {['English', 'Spanish', 'Somali', 'Hmong', 'Arabic'].map((language) => (
-                    <div key={language} className="flex items-center space-x-2">
-                      <Checkbox id={`language-${language.toLowerCase()}`} defaultChecked={language === 'English'} />
-                      <label
-                        htmlFor={`language-${language.toLowerCase()}`}
-                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {language}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Cultural Needs</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select if applicable" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="african-american">African American-focused</SelectItem>
-                      <SelectItem value="east-african">East African-focused</SelectItem>
-                      <SelectItem value="hmong">Hmong-focused</SelectItem>
-                      <SelectItem value="latino">Latino-focused</SelectItem>
-                      <SelectItem value="native">Native American-focused</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Insurance Coverage</Label>
-                  <Select defaultValue="medicaid">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select insurance type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="medicaid">Medicaid</SelectItem>
-                      <SelectItem value="medicare">Medicare</SelectItem>
-                      <SelectItem value="private">Private Insurance</SelectItem>
-                      <SelectItem value="self-pay">Self-Pay</SelectItem>
-                      <SelectItem value="sliding-scale">Sliding Scale</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Accessibility Needs</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                  {['Wheelchair', 'Autism Support', 'Hearing Impaired', 'Visual Impaired', 'Sensory Needs'].map((need) => (
-                    <div key={need} className="flex items-center space-x-2">
-                      <Checkbox id={`need-${need.toLowerCase().replace(' ', '-')}`} />
-                      <label
-                        htmlFor={`need-${need.toLowerCase().replace(' ', '-')}`}
-                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {need}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Transportation Required?</Label>
-                <RadioGroup defaultValue="no" className="flex gap-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="transport-yes" />
-                    <Label htmlFor="transport-yes">Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="transport-no" />
-                    <Label htmlFor="transport-no">No</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Step 3: Provider Matching Preferences */}
-        {step === 3 && (
-          <div className="animate-fade-in">
-            <div className="mb-8">
-              <div className="bg-referra-50 text-referra-700 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-2">
-                Step 3
-              </div>
               <h3 className="text-lg font-semibold">Provider Matching Preferences</h3>
-              <p className="text-gray-500 mt-1">Help us find the right providers for your client</p>
+              <p className="text-gray-500 mt-1">Help us find the right providers</p>
             </div>
             
             <div className="space-y-6">
@@ -395,6 +273,40 @@ const ReferralForm = ({ onComplete }: ReferralFormProps) => {
                     <Label htmlFor="provider-faith-based">Faith-based</Label>
                   </div>
                 </RadioGroup>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Insurance Accepted</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  {['Medicaid', 'Medicare', 'Private Insurance', 'Self-Pay', 'Sliding Scale'].map((insurance) => (
+                    <div key={insurance} className="flex items-center space-x-2">
+                      <Checkbox id={`insurance-${insurance.toLowerCase().replace(' ', '-')}`} />
+                      <label
+                        htmlFor={`insurance-${insurance.toLowerCase().replace(' ', '-')}`}
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {insurance}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Languages Available</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  {['English', 'Spanish', 'Somali', 'Hmong', 'Arabic'].map((language) => (
+                    <div key={language} className="flex items-center space-x-2">
+                      <Checkbox id={`language-${language.toLowerCase()}`} defaultChecked={language === 'English'} />
+                      <label
+                        htmlFor={`language-${language.toLowerCase()}`}
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {language}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
               
               <div className="space-y-2">
@@ -439,7 +351,7 @@ const ReferralForm = ({ onComplete }: ReferralFormProps) => {
                   </label>
                 </div>
                 <p className="text-xs text-gray-600 ml-6">
-                  Only show providers that have confirmed available capacity to accept new clients
+                  Only show providers that have confirmed available capacity to accept new referrals
                 </p>
               </div>
               
@@ -468,12 +380,12 @@ const ReferralForm = ({ onComplete }: ReferralFormProps) => {
           </div>
         )}
         
-        {/* Step 4: Contact & Follow-Up */}
-        {step === 4 && (
+        {/* Step 3: Contact & Follow-Up */}
+        {step === 3 && (
           <div className="animate-fade-in">
             <div className="mb-8">
               <div className="bg-referra-50 text-referra-700 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-2">
-                Step 4
+                Step 3
               </div>
               <h3 className="text-lg font-semibold">Contact & Follow-Up</h3>
               <p className="text-gray-500 mt-1">Your information for provider communications</p>
@@ -493,70 +405,74 @@ const ReferralForm = ({ onComplete }: ReferralFormProps) => {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="manager@agency.org" />
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input id="email" type="email" defaultValue="manager@example.com" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" defaultValue="(612) 555-0123" />
+                  <Input id="phone" defaultValue="(555) 123-4567" />
                 </div>
               </div>
               
-              <div className="border-t pt-6 mt-8">
-                <div className="p-4 mb-6 rounded-lg bg-green-50 border border-green-200 flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-green-900">Ready for Provider Matching</h4>
-                    <p className="text-sm text-green-800 mt-1">
-                      Based on your selections, we've identified 27 potential provider matches for this referral.
-                    </p>
+              <div className="space-y-2">
+                <Label>Notification Preferences</Label>
+                <div className="space-y-2 mt-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="notify-email" defaultChecked />
+                    <label
+                      htmlFor="notify-email"
+                      className="text-sm leading-none"
+                    >
+                      Email notifications
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="notify-sms" />
+                    <label
+                      htmlFor="notify-sms"
+                      className="text-sm leading-none"
+                    >
+                      SMS notifications
+                    </label>
                   </div>
                 </div>
-                
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-3">Referral Summary</h4>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Service Needed:</span>
-                      <span>Mental Health Services</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Urgency:</span>
-                      <span>Medium</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Client:</span>
-                      <span>Maria Johnson</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Insurance:</span>
-                      <span>Medicaid</span>
-                    </div>
-                  </div>
-                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="notes">Additional Notes for Providers</Label>
+                <Textarea 
+                  id="notes" 
+                  placeholder="Any specific details you want providers to know about this referral..."
+                  className="min-h-[100px]"
+                />
+              </div>
+              
+              <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> After submitting this referral, matched providers will be notified. You'll be able to communicate directly with providers who accept the referral.
+                </p>
               </div>
             </div>
           </div>
         )}
         
-        {/* Form Navigation */}
-        <div className="flex justify-between mt-8 pt-6 border-t">
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-8">
           <Button
+            type="button"
             variant="outline"
             onClick={prevStep}
             disabled={step === 1}
-            className="flex items-center gap-2"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Previous</span>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Previous
           </Button>
-          
-          <Button 
+          <Button
+            type="button"
             onClick={nextStep}
-            className="bg-referra-500 hover:bg-referra-600 transition-colors flex items-center gap-2"
           >
-            <span>{step === totalSteps ? 'Submit Referral' : 'Next'}</span>
-            <ArrowRight className="h-4 w-4" />
+            {step === totalSteps ? 'Submit Referral' : 'Next'}
+            {step !== totalSteps && <ArrowRight className="h-4 w-4 ml-2" />}
           </Button>
         </div>
       </div>
