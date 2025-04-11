@@ -62,8 +62,8 @@ async function makeApiRequest<T>(
     const requestOptions: RequestInit = {
       method,
       headers,
-      credentials: 'omit', // Changed from 'include' to 'omit' for CORS
       mode: 'cors', // Explicitly set CORS mode
+      credentials: 'omit', // Don't send cookies for cross-origin requests
     };
 
     // Add body for non-GET requests
@@ -86,20 +86,42 @@ async function makeApiRequest<T>(
     // Make the API request
     const url = endpoint.startsWith('http') ? endpoint : `${API_URL}${endpoint}`;
     console.log(`Making ${method} request to: ${url}`);
+    console.log('Request options:', JSON.stringify(requestOptions));
     
-    const response = await fetch(url, requestOptions);
-    
-    // Handle HTTP errors
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API error: ${response.status} - ${errorText}`);
+    try {
+      const response = await fetch(url, requestOptions);
+      
+      // Log detailed information about the response
+      console.log(`Response status: ${response.status} ${response.statusText}`);
+      console.log('Response headers:', [...response.headers.entries()]);
+      
+      // Handle HTTP errors
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`HTTP error ${response.status}: ${errorText}`);
+        throw new Error(`API error: ${response.status} - ${errorText}`);
+      }
+      
+      // Parse the response as JSON
+      const data = await response.json();
+      console.log('Response data:', data);
+      return { success: true, data };
+    } catch (fetchError) {
+      console.error('Fetch error details:', fetchError);
+      
+      // More detailed diagnostics for network errors
+      if (fetchError instanceof TypeError && fetchError.message === 'Failed to fetch') {
+        console.error('Network error - possible causes:');
+        console.error('1. CORS policy blocking the request');
+        console.error('2. API Gateway not properly configured for CORS');
+        console.error('3. Network connectivity issues');
+        console.error('4. API URL is incorrect or service is down');
+      }
+      
+      throw fetchError;
     }
-    
-    // Parse the response as JSON
-    const data = await response.json();
-    return { success: true, data };
   } catch (error) {
-    console.error(`API request failed: ${error}`);
+    console.error(`API request failed:`, error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : "Unknown error occurred" 
@@ -111,6 +133,14 @@ async function makeApiRequest<T>(
  * AWS API client service for making authenticated requests to API Gateway
  */
 export const awsApiClient = {
+  /**
+   * Test connection to the API
+   */
+  async testConnection(): Promise<ApiResponse<{message: string}>> {
+    // Just perform a simple GET request to see if we can reach the API
+    return await makeApiRequest<{message: string}>('/', 'GET');
+  },
+
   /**
    * Fetch clients from AWS API
    */
@@ -171,10 +201,14 @@ export const awsApiClient = {
     insuranceType: "Medicaid",
     medicalNotes: "Asthma",
     urgency: "high",
-    culturalNeeds: ["Halal meals"], // Corrected to be an array
+    culturalNeeds: ["Halal meals"],
     languagePreferences: ["Somali", "English"]
   }): Promise<ApiResponse<any>> {
-    const testEndpoint = "https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData";
-    return await makeApiRequest<any>(testEndpoint, 'POST', payload);
+    // Make the endpoint configurable
+    const testEndpoint = import.meta.env.VITE_AWS_TEST_ENDPOINT || "/insertClientData";
+    const url = testEndpoint.startsWith('http') ? testEndpoint : `${API_URL}${testEndpoint}`;
+    
+    console.log(`Using test endpoint: ${url}`);
+    return await makeApiRequest<any>(url, 'POST', payload);
   }
 };
