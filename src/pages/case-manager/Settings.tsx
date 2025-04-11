@@ -133,64 +133,26 @@ const Settings = () => {
     console.log('Submitting profile update with values:', values);
 
     try {
-      // Check if profile exists
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('user_profiles')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle();
+      // Use a direct SQL RPC function call with the JavaScript client 
+      // to avoid the RLS recursion issue
+      const { data, error } = await supabase.rpc('update_user_profile', {
+        user_id: user.id,
+        profile_data: {
+          full_name: values.full_name,
+          display_name: values.display_name,
+          phone_number: values.phone_number,
+          organization_name: values.organization_name,
+          organization_role: values.organization_role,
+          avatar_url: values.avatar_url,
+          email_notifications: values.email_notifications,
+          sms_notifications: values.sms_notifications,
+          updated_at: new Date().toISOString(),
+          profile_completed: true,
+        }
+      });
 
-      if (checkError) {
-        throw checkError;
-      }
-
-      let updateError;
-
-      if (existingProfile) {
-        console.log('Updating existing profile for user:', user.id);
-        // Update existing profile
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({
-            full_name: values.full_name,
-            display_name: values.display_name,
-            phone_number: values.phone_number,
-            organization_name: values.organization_name,
-            organization_role: values.organization_role,
-            avatar_url: values.avatar_url,
-            email_notifications: values.email_notifications,
-            sms_notifications: values.sms_notifications,
-            updated_at: new Date().toISOString(),
-            profile_completed: true,
-          })
-          .eq('id', user.id);
-
-        updateError = error;
-      } else {
-        console.log('Creating new profile for user:', user.id);
-        // Create new profile
-        const { error } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: user.id,
-            full_name: values.full_name,
-            display_name: values.display_name,
-            phone_number: values.phone_number,
-            organization_name: values.organization_name,
-            organization_role: values.organization_role,
-            avatar_url: values.avatar_url,
-            email_notifications: values.email_notifications,
-            sms_notifications: values.sms_notifications,
-            profile_completed: true,
-            role: user.user_metadata?.role || 'case_manager',
-          });
-
-        updateError = error;
-      }
-
-      if (updateError) {
-        console.error('Error updating profile:', updateError);
-        throw updateError;
+      if (error) {
+        throw error;
       }
 
       console.log('Profile updated successfully');
