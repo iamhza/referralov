@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -135,21 +136,24 @@ const Settings = () => {
     try {
       // Use a direct SQL RPC function call with the JavaScript client 
       // to avoid the RLS recursion issue
-      const { data, error } = await supabase.rpc('update_user_profile', {
-        user_id: user.id,
-        profile_data: {
-          full_name: values.full_name,
-          display_name: values.display_name,
-          phone_number: values.phone_number,
-          organization_name: values.organization_name,
-          organization_role: values.organization_role,
-          avatar_url: values.avatar_url,
-          email_notifications: values.email_notifications,
-          sms_notifications: values.sms_notifications,
-          updated_at: new Date().toISOString(),
-          profile_completed: true,
+      const { data, error } = await supabase.rpc(
+        'update_user_profile' as any, // Type assertion to bypass TypeScript error
+        {
+          user_id: user.id,
+          profile_data: {
+            full_name: values.full_name,
+            display_name: values.display_name,
+            phone_number: values.phone_number,
+            organization_name: values.organization_name,
+            organization_role: values.organization_role,
+            avatar_url: values.avatar_url,
+            email_notifications: values.email_notifications,
+            sms_notifications: values.sms_notifications,
+            updated_at: new Date().toISOString(),
+            profile_completed: true,
+          }
         }
-      });
+      );
 
       if (error) {
         throw error;

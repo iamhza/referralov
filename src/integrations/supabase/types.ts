@@ -582,6 +582,10 @@ export type Database = {
         Args: { "": string }
         Returns: string[]
       }
+      update_user_profile: {
+        Args: { user_id: string; profile_data: Json }
+        Returns: Json
+      }
     }
     Enums: {
       match_response_type: "pending" | "accepted" | "declined"
