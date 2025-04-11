@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Clock, ArrowRight, Calendar, CheckCircle2 } from 'lucide-react';
+import { Flame, Clock, ArrowRight, Calendar, CheckCircle2, Tag, FileText, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,9 @@ interface ReferralCardProps {
   timeInStage: string;
   stage: 'pending' | 'matched' | 'active' | 'completed';
   providersCount?: number;
+  referenceCode?: string;
+  createdDate?: string;
+  category?: string;
   onClick?: () => void;
 }
 
@@ -26,14 +29,20 @@ const OpenReferrals = () => {
       urgency: 'high',
       timeInStage: '2 days',
       stage: 'matched',
-      providersCount: 4
+      providersCount: 4,
+      referenceCode: 'MH-2025-A',
+      createdDate: 'Apr 9, 2025',
+      category: 'Mental Health'
     },
     {
       id: '2',
       service: 'Housing stabilization services (HSS)',
       urgency: 'medium',
       timeInStage: '1 day',
-      stage: 'pending'
+      stage: 'pending',
+      referenceCode: 'HS-2025-B',
+      createdDate: 'Apr 10, 2025',
+      category: 'Housing'
     },
     {
       id: '3',
@@ -41,14 +50,20 @@ const OpenReferrals = () => {
       urgency: 'high',
       timeInStage: '3 days',
       stage: 'matched',
-      providersCount: 3
+      providersCount: 3,
+      referenceCode: 'SA-2025-C',
+      createdDate: 'Apr 7, 2025',
+      category: 'Substance Use'
     },
     {
       id: '4',
       service: 'Family training',
       urgency: 'low',
       timeInStage: '5 days',
-      stage: 'active'
+      stage: 'active',
+      referenceCode: 'FT-2025-D',
+      createdDate: 'Apr 5, 2025',
+      category: 'Family Services'
     }
   ];
   
@@ -90,6 +105,9 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
   timeInStage, 
   stage,
   providersCount,
+  referenceCode,
+  createdDate,
+  category,
   onClick 
 }) => {
   const navigate = useNavigate();
@@ -114,6 +132,13 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
     completed: <CheckCircle2 className="h-4 w-4 mr-2" />
   };
   
+  const categoryColors = {
+    'Mental Health': 'bg-purple-100 text-purple-800',
+    'Housing': 'bg-green-100 text-green-800',
+    'Substance Use': 'bg-blue-100 text-blue-800',
+    'Family Services': 'bg-orange-100 text-orange-800'
+  };
+  
   const handleAction = () => {
     if (stage === 'matched') {
       navigate(`/matched-providers/${id}`);
@@ -128,7 +153,15 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
     <div className="border rounded-lg p-5 hover:shadow-md transition-all duration-200 bg-white">
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
-          <h3 className="font-medium text-gray-900">Referral #{id}</h3>
+          <div className="flex items-center gap-2 mb-1.5">
+            <h3 className="font-medium text-gray-900">#{id}</h3>
+            {referenceCode && (
+              <Badge variant="outline" className="text-xs font-normal">
+                <Tag className="h-3 w-3 mr-1" />
+                {referenceCode}
+              </Badge>
+            )}
+          </div>
           <p className="text-sm text-gray-600 mt-1 line-clamp-1">{service}</p>
         </div>
         <Badge className={`ml-2 ${urgencyColors[urgency]}`}>
@@ -138,10 +171,26 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
       </div>
       
       <div className="flex flex-col gap-2 text-sm text-gray-600 mb-3">
+        {category && (
+          <div className="flex items-start mb-1">
+            <Badge className={`${categoryColors[category as keyof typeof categoryColors] || 'bg-gray-100 text-gray-800'} mr-1`}>
+              <FileText className="h-3 w-3 mr-1" />
+              {category}
+            </Badge>
+          </div>
+        )}
+        
         <div className="flex items-center">
           <Clock className="h-4 w-4 mr-2 text-gray-400" />
           <span>In stage for {timeInStage}</span>
         </div>
+        
+        {createdDate && (
+          <div className="flex items-center">
+            <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+            <span>Created on {createdDate}</span>
+          </div>
+        )}
         
         {stage === 'matched' && providersCount && (
           <div className="flex items-center">
