@@ -175,8 +175,13 @@ const LandingPage = () => {
               </div>
               <span className="text-xl font-semibold">Referra</span>
             </div>
-            <div className="text-sm text-gray-500">
-              © 2023 Referra. All rights reserved. Demo version for conference presentation.
+            <div className="flex flex-col items-center md:items-end">
+              <div className="text-sm text-gray-500 mb-2">
+                © 2023 Referra. All rights reserved. Demo version for conference presentation.
+              </div>
+              <Link to="/admin/login" className="text-xs text-gray-400 hover:text-referra-600 transition-colors">
+                Admin Access
+              </Link>
             </div>
           </div>
         </div>
