@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { awsApiClient } from '@/services/awsApiClient';
 import { Button } from '@/components/ui/button';
@@ -37,6 +36,9 @@ export function ApiTester() {
   const [clientData, setClientData] = useState<any>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(false);
   const [connectionState, setConnectionState] = useState<'unchecked' | 'success' | 'error'>('unchecked');
+  
+  // Get API URL from environment variable
+  const apiUrl = import.meta.env.VITE_AWS_API_URL || "https://nndjr3excb.execute-api.us-east-2.amazonaws.com/dev";
   
   // Check API connection
   const checkConnection = async () => {
@@ -185,7 +187,7 @@ export function ApiTester() {
       setIsFetching(false);
     }
   };
-
+  
   const handlePayloadChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPayload(e.target.value);
   };
@@ -291,7 +293,7 @@ export function ApiTester() {
             <div className="space-y-4">
               <div className="p-4 bg-gray-100 rounded-md">
                 <h3 className="font-semibold mb-2">Endpoint:</h3>
-                <p className="break-all text-sm">{API_URL}/insertClientData</p>
+                <p className="break-all text-sm">{apiUrl}/insertClientData</p>
                 
                 <h3 className="font-semibold mt-4 mb-2">Test Payload:</h3>
                 <textarea 
