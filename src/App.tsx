@@ -46,6 +46,7 @@ const App = () => (
           {/* Provider routes */}
           <Route path="/provider" element={<ProviderDashboard />} />
           <Route path="/provider/referrals" element={<ProviderReferrals />} />
+          <Route path="/provider/referral-tracker/:referralId" element={<ReferralTracker />} />
           
           {/* Redirect old routes to new structured routes */}
           <Route path="/referrals" element={<Navigate to="/case-manager/referrals" replace />} />
