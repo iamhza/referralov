@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   MessageSquare, 
@@ -28,6 +29,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Task status types
 type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'blocked';
+type UserRole = 'provider' | 'case_manager';
 
 // Communication task interface
 interface CommunicationTask {
@@ -36,7 +38,7 @@ interface CommunicationTask {
   description: string;
   status: TaskStatus;
   dueDate?: string;
-  assignedTo: 'provider' | 'case_manager';
+  assignedTo: UserRole;
   dateCreated: string;
   lastUpdated?: string;
   comments: TaskComment[];
@@ -47,7 +49,7 @@ interface TaskComment {
   id: string;
   userId: string;
   userName: string;
-  userRole: 'provider' | 'case_manager';
+  userRole: UserRole;
   content: string;
   timestamp: string;
 }
@@ -156,7 +158,7 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
               id: `c${Date.now()}`,
               userId: 'cm1',
               userName: 'Sarah Johnson',
-              userRole: 'case_manager' as const,
+              userRole: 'case_manager',
               content: newComment.trim(),
               timestamp: new Date().toISOString()
             }

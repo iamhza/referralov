@@ -75,7 +75,7 @@ interface ReferralFormProps {
   onComplete?: () => void;
 }
 
-export const ReferralForm = ({ onComplete }: ReferralFormProps) => {
+const ReferralForm = ({ onComplete }: ReferralFormProps) => {
   const [step, setStep] = useState(1);
   const [date, setDate] = useState<Date>();
   const [selectedService, setSelectedService] = useState<string>("");
@@ -99,7 +99,7 @@ export const ReferralForm = ({ onComplete }: ReferralFormProps) => {
       
       // Navigate to the matched-providers route with the referral ID
       setTimeout(() => {
-        navigate(`/matched-providers/${referralId}`);
+        navigate(`/case-manager/matched-providers/${referralId}`);
       }, 1500);
     }
   };
