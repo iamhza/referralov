@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -665,4 +666,37 @@ const LandingPage = () => {
                 }
               ].map((card, index) => (
                 <div key={index} className="group relative min-h-[420px]">
-                  <div className="absolute -inset-4 rounded-2xl bg-gradient-to-r from-blue-5
+                  <div className="absolute -inset-4 rounded-2xl bg-gradient-to-r from-blue-50/5 to-indigo-50/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative z-10 h-full flex flex-col">
+                    <h3 className="text-xl font-semibold mb-3">{card.title}</h3>
+                    <p className="text-gray-600 mb-6">{card.description}</p>
+                    <div className="mt-auto">
+                      <div className="space-y-3">
+                        {card.features.map((feature, idx) => (
+                          <div key={idx} className="flex items-center gap-3">
+                            <div className="w-5 h-5 rounded-full bg-referra-50 flex items-center justify-center flex-shrink-0">
+                              <Check className="w-3 h-3 text-referra-600" />
+                            </div>
+                            <span className="text-sm text-gray-700">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-6">
+                        <button className="text-referra-600 font-medium text-sm inline-flex items-center gap-1 hover:text-referra-700 transition-colors">
+                          Learn more
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default LandingPage;
