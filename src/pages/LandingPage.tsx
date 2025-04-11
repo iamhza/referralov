@@ -440,6 +440,10 @@ const LandingPage = () => {
     }
   };
 
+  const handleSignIn = () => {
+    navigate('/signin');
+  };
+
   const AnnouncementBanner = () => (
     <div className="inline-flex items-center gap-2 rounded-full bg-referra-50 border border-referra-100 px-4 py-1.5 text-sm font-medium text-referra-700">
       <Badge className="bg-referra-200 text-referra-700 hover:bg-referra-200 px-2 py-0.5 text-[11px]">NEW</Badge>
@@ -505,7 +509,7 @@ const LandingPage = () => {
             <div className="flex items-center gap-4">
               <Button 
                 variant="ghost" 
-                onClick={() => navigate('/signin')}
+                onClick={handleSignIn}
                 className="cursor-pointer"
               >
                 Sign In
