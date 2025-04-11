@@ -9,19 +9,12 @@ import PriorityMetrics from '@/components/dashboard/PriorityMetrics';
 import { ClientTable } from '@/components/dashboard/ClientTable';
 import ActionPanel from '@/components/dashboard/ActionPanel';
 import { FeaturedProviders } from '@/components/dashboard/FeaturedProviders';
-import { ApiTester } from '@/components/ApiTester';
 
 const Index = () => {
   return (
     <DashboardLayout>
       <div className="container px-4 py-6 space-y-6 max-w-7xl mx-auto">
         <DashboardHeader />
-        
-        {/* API Tester Component */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-4">API Gateway Test</h2>
-          <ApiTester />
-        </div>
         
         {/* Dashboard Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
