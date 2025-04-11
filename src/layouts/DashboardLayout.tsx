@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Type for the navigation items
 type NavItem = {
@@ -32,6 +33,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const isSmallScreen = useMediaQuery('(max-width: 1024px)');
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
 
   // Determine if the user is on a provider route or case manager route
   const isProviderRoute = location.pathname.startsWith('/provider');
@@ -68,6 +71,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       href: userRole === 'provider' ? '/provider/messages' : '/case-manager/messages',
       icon: <MessageSquare className="h-5 w-5" />,
       role: 'both'
+    },
+    {
+      title: 'Settings',
+      href: userRole === 'provider' ? '/provider/settings' : '/case-manager/settings',
+      icon: <Settings className="h-5 w-5" />,
+      role: 'both'
     }
   ];
 
@@ -79,6 +88,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   // Toggle sidebar
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
   };
 
   // Close sidebar if screen size changes to larger than mobile
@@ -137,7 +152,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {userRole === 'provider' ? 'Provider User' : 'Case Manager'}
+                  {user?.email || (userRole === 'provider' ? 'Provider User' : 'Case Manager')}
                 </p>
                 <p className="text-xs text-gray-500 truncate">
                   {userRole === 'provider' ? 'Service Provider' : 'Case Management'}
@@ -145,11 +160,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
             <div className="mt-4 space-y-1">
-              <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start text-gray-700"
+                asChild
+              >
+                <Link to={userRole === 'provider' ? '/provider/settings' : '/case-manager/settings'}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Link>
               </Button>
-              <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start text-gray-700"
+                onClick={handleSignOut}
+              >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign out
               </Button>

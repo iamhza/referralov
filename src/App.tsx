@@ -18,6 +18,7 @@ import NewReferral from "./pages/case-manager/NewReferral";
 import Referrals from "./pages/case-manager/Referrals";
 import ReferralTracker from "./pages/case-manager/ReferralTracker";
 import MatchedProviders from "./pages/case-manager/MatchedProviders";
+import CaseManagerSettings from "./pages/case-manager/Settings";
 
 // Provider pages
 import ProviderDashboard from "./pages/provider/Dashboard";
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/case-manager/referrals" element={<Referrals />} />
             <Route path="/case-manager/matched-providers/:referralId" element={<MatchedProviders />} />
             <Route path="/case-manager/referral-tracker/:referralId" element={<ReferralTracker />} />
+            <Route path="/case-manager/settings" element={<CaseManagerSettings />} />
             
             {/* Provider routes */}
             <Route path="/provider" element={<ProviderDashboard />} />
