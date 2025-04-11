@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useToast } from '@/hooks/use-toast';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 type NavItem = {
   title: string;
@@ -32,45 +32,19 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery('(max-width: 1024px)');
   const { toast } = useToast();
+  const { user, isAdmin, signOut } = useAuth();
 
   // Check if user is authenticated as admin
   useEffect(() => {
-    const checkAdminAuth = () => {
-      const adminAuth = localStorage.getItem('referraAdminAuth');
-      
-      if (!adminAuth) {
-        toast({
-          title: "Authentication required",
-          description: "Please login to access the admin dashboard",
-          variant: "destructive"
-        });
-        navigate('/admin/login');
-        return;
-      }
-      
-      try {
-        const auth = JSON.parse(adminAuth);
-        const now = new Date().getTime();
-        const fourHoursInMs = 4 * 60 * 60 * 1000;
-        
-        // Check if token is expired (4 hour session)
-        if (!auth.isAdmin || now - auth.timestamp > fourHoursInMs) {
-          localStorage.removeItem('referraAdminAuth');
-          toast({
-            title: "Session expired",
-            description: "Please login again to continue",
-            variant: "destructive"
-          });
-          navigate('/admin/login');
-        }
-      } catch (error) {
-        localStorage.removeItem('referraAdminAuth');
-        navigate('/admin/login');
-      }
-    };
-    
-    checkAdminAuth();
-  }, [navigate, toast]);
+    if (!user || !isAdmin) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to access the admin dashboard",
+        variant: "destructive"
+      });
+      navigate('/admin/login');
+    }
+  }, [user, isAdmin, navigate, toast]);
 
   // Navigation items
   const navItems: NavItem[] = [
@@ -102,13 +76,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem('referraAdminAuth');
+  const handleLogout = async () => {
+    await signOut();
     toast({
       title: "Logged out",
       description: "You have been logged out of the admin dashboard",
     });
-    navigate('/admin/login');
   };
 
   // Close sidebar if screen size changes to larger than mobile
@@ -118,18 +91,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isSmallScreen]);
 
-  // Get admin username
-  const getAdminUsername = () => {
-    try {
-      const adminAuth = localStorage.getItem('referraAdminAuth');
-      if (adminAuth) {
-        const { username } = JSON.parse(adminAuth);
-        return username || 'Admin';
-      }
-    } catch (error) {
-      return 'Admin';
-    }
-    return 'Admin';
+  // Get admin username or email
+  const getAdminDisplayName = () => {
+    if (!user) return 'Admin';
+    
+    // Try to get the display name from user profile if exists
+    const userEmail = user.email || '';
+    const emailUsername = userEmail.split('@')[0];
+    return emailUsername || 'Admin';
   };
 
   return (
@@ -176,12 +145,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex items-center space-x-3">
               <Avatar>
                 <AvatarFallback className="bg-referra-700 text-white">
-                  {getAdminUsername().charAt(0).toUpperCase()}
+                  {getAdminDisplayName().charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
-                  {getAdminUsername()}
+                  {getAdminDisplayName()}
                 </p>
                 <p className="text-xs text-gray-400 truncate">
                   Administrator

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,46 +9,40 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { Lock, Shield } from 'lucide-react';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signIn, isAdmin } = useAuth();
 
-  // In a real implementation, this would be replaced with a proper authentication system
-  // For now, we're using a simple hardcoded check for demo purposes
-  const handleSubmit = (e: React.FormEvent) => {
+  // Check if user is already logged in as admin
+  useEffect(() => {
+    if (isAdmin) {
+      navigate('/admin');
+    }
+  }, [isAdmin, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Simulate authentication check
-    setTimeout(() => {
-      // Simple check - in production, this would be a proper authentication system
-      if ((username === 'admin1' && password === 'referra123') || 
-          (username === 'admin2' && password === 'referra123')) {
-        
-        // Store admin session
-        localStorage.setItem('referraAdminAuth', JSON.stringify({
-          isAdmin: true,
-          username,
-          timestamp: new Date().getTime()
-        }));
-        
-        toast({
-          title: "Admin access granted",
-          description: "Welcome to the Referra Admin Dashboard",
-        });
-        
-        navigate('/admin');
-      } else {
-        setError('Invalid admin credentials. Please try again.');
-      }
+    try {
+      // Use the same signIn function from AuthContext
+      await signIn(email, password);
+      
+      // Authentication state will be updated by AuthContext
+      // Navigation will happen in useEffect when isAdmin becomes true
+    } catch (error: any) {
+      setError(error.message || 'Failed to sign in. Please check your credentials.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -80,12 +74,13 @@ const AdminLogin = () => {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input 
-                  id="username" 
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter admin username"
+                  id="email" 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter admin email"
                   required
                 />
               </div>
@@ -97,7 +92,7 @@ const AdminLogin = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter admin password"
+                  placeholder="Enter password"
                   required
                 />
               </div>
@@ -110,7 +105,7 @@ const AdminLogin = () => {
                 {isLoading ? (
                   <span className="flex items-center">
                     <Lock className="mr-2 h-4 w-4 animate-pulse" />
-                    Verifying...
+                    Signing in...
                   </span>
                 ) : (
                   <span className="flex items-center">
