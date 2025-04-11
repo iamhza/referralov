@@ -1,3 +1,4 @@
+
 // AWS API configuration
 const API_URL = import.meta.env.VITE_AWS_API_URL || "https://nndjr3excb.execute-api.us-east-2.amazonaws.com/dev";
 const API_KEY = import.meta.env.VITE_AWS_API_KEY || "";
@@ -95,7 +96,7 @@ async function makeApiRequest<T>(
       console.log(`Response status: ${response.status} ${response.statusText}`);
       console.log('Response headers:', [...response.headers.entries()]);
       
-      // Handle HTTP errors
+      // Check if response is valid
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`HTTP error ${response.status}: ${errorText}`);
@@ -105,6 +106,17 @@ async function makeApiRequest<T>(
       // Parse the response as JSON
       const data = await response.json();
       console.log('Response data:', data);
+      
+      // Special handling for Lambda errors that return 200 status but contain error information
+      if (data && data.errorType && data.errorMessage) {
+        console.error('Lambda function error:', data);
+        return { 
+          success: false, 
+          error: `Lambda function error: ${data.errorMessage}`,
+          data: data // Still include the data for debugging
+        };
+      }
+      
       return { success: true, data };
     } catch (fetchError) {
       console.error('Fetch error details:', fetchError);
