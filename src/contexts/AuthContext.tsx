@@ -95,20 +95,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        fetchUserRole(data.user.id);
+        // First fetch the user role to determine where to navigate
+        if (data.user.id) {
+          await fetchUserRole(data.user.id);
+        }
+        
         toast({
           title: 'Signed in successfully',
           description: `Welcome back, ${data.user.email}!`,
         });
         
-        // Navigate based on role
-        if (userRole === 'admin') {
-          navigate('/admin');
-        } else if (userRole === 'provider') {
-          navigate('/provider');
-        } else {
-          navigate('/case-manager');
-        }
+        // Navigate based on role - using a timeout to allow the role to be fetched
+        setTimeout(() => {
+          if (userRole === 'admin') {
+            navigate('/admin');
+          } else if (userRole === 'provider') {
+            navigate('/provider');
+          } else {
+            navigate('/case-manager');
+          }
+        }, 500);
       }
     } catch (error: any) {
       toast({
@@ -147,8 +153,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: 'Please check your email to confirm your account',
         });
         
-        // Don't navigate yet if email confirmation is required
-        // Instead, show a message about checking email
+        // Don't automatically redirect if email confirmation is required
+        // Instead, show the success screen in the SignUp component
       }
     } catch (error: any) {
       toast({

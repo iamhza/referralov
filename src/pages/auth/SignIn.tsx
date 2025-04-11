@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { 
   Card, 
   CardContent, 
@@ -14,12 +14,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Redirect if already logged in
   if (user) {
@@ -32,6 +35,14 @@ const SignIn = () => {
     
     try {
       await signIn(email, password);
+      // The redirect is handled in the signIn function in AuthContext
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      toast({
+        title: 'Sign in failed',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
