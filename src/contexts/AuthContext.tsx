@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Set up the auth state change listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUserRole(null);
           setUserProfile(null);
         } else if (session?.user) {
-          // We'll load profile data via setTimeout to avoid Supabase deadlock
+          // Defer profile fetching to avoid Supabase deadlock
           setTimeout(() => {
             fetchUserProfile(session.user.id);
           }, 0);
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
+    // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -65,7 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function fetchUserProfile(userId: string) {
     try {
-      // Use a simple query that won't trigger the recursion error
+      console.log('Fetching user profile for:', userId);
+      
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -74,15 +77,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Error fetching user profile:', error);
+        // Fall back to metadata
+        if (user?.user_metadata) {
+          const fallbackProfile = {
+            id: userId,
+            full_name: user.user_metadata.full_name || user.email?.split('@')[0],
+            role: user.user_metadata.role || 'case_manager'
+          };
+          console.log('Using fallback profile from metadata:', fallbackProfile);
+          setUserRole(fallbackProfile.role);
+          setUserProfile(fallbackProfile);
+        }
         return;
       }
 
       if (data) {
+        console.log('User profile loaded successfully:', data);
         setUserRole(data.role);
         setUserProfile(data);
+      } else {
+        console.log('No profile found for user ID:', userId);
+        // Fall back to metadata
+        if (user?.user_metadata) {
+          const fallbackProfile = {
+            id: userId,
+            full_name: user.user_metadata.full_name || user.email?.split('@')[0],
+            role: user.user_metadata.role || 'case_manager'
+          };
+          console.log('Using fallback profile from metadata:', fallbackProfile);
+          setUserRole(fallbackProfile.role);
+          setUserProfile(fallbackProfile);
+        }
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Unexpected error fetching user profile:', error);
     }
   }
 
@@ -103,15 +131,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        if (data.user.id) {
-          await fetchUserProfile(data.user.id);
-        }
-        
         toast({
           title: 'Signed in successfully',
           description: `Welcome back, ${data.user.email}!`,
         });
         
+        if (data.user.id) {
+          await fetchUserProfile(data.user.id);
+        }
+        
+        // Short delay to allow profile to load
         setTimeout(() => {
           if (userRole === 'admin') {
             navigate('/admin');
@@ -158,7 +187,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: 'Account created',
           description: 'Please check your email to confirm your account',
         });
-        // We won't return the data object to match the Promise<void> return type
       }
     } catch (error: any) {
       toast({

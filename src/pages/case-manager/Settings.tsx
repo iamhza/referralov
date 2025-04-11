@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Save } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,10 +51,14 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 const Settings = () => {
   const { user, userProfile } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    console.log('User object:', user);
+    console.log('User profile from context:', userProfile);
+  }, [user, userProfile]);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -72,148 +74,82 @@ const Settings = () => {
     },
   });
 
-  // Fetch user profile data
   useEffect(() => {
-    const loadProfileData = () => {
-      if (!user?.id) return;
-      
-      setIsLoading(true);
-      setFetchError(null);
-      
-      try {
-        console.log('Loading profile data for user ID:', user.id);
-        
-        // First check if we already have the profile data in context
-        if (userProfile) {
-          console.log('Profile data loaded from context:', userProfile);
-          // Fill the form with the profile data from context
-          form.reset({
-            full_name: userProfile.full_name || '',
-            display_name: userProfile.display_name || '',
-            phone_number: userProfile.phone_number || '',
-            organization_name: userProfile.organization_name || '',
-            organization_role: userProfile.organization_role || '',
-            avatar_url: userProfile.avatar_url || '',
-            email_notifications: userProfile.email_notifications ?? true,
-            sms_notifications: userProfile.sms_notifications ?? false,
-          });
-          setIsLoading(false);
-          return;
-        }
-        
-        // If not in context, fetch directly (as a fallback)
-        fetchProfileDirectly();
-        
-      } catch (error: any) {
-        console.error('Unexpected error loading profile:', error);
-        setFetchError(`An unexpected error occurred: ${error.message}`);
-        setIsLoading(false);
-      }
-    };
-
-    const fetchProfileDirectly = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user?.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error('Error fetching profile directly:', error);
-          setFetchError(`Could not load profile data: ${error.message}`);
-          loadFallbackData();
-          return;
-        }
-
-        if (data) {
-          console.log('Profile data loaded directly:', data);
-          form.reset({
-            full_name: data.full_name || '',
-            display_name: data.display_name || '',
-            phone_number: data.phone_number || '',
-            organization_name: data.organization_name || '',
-            organization_role: data.organization_role || '',
-            avatar_url: data.avatar_url || '',
-            email_notifications: data.email_notifications ?? true,
-            sms_notifications: data.sms_notifications ?? false,
-          });
-        } else {
-          console.log('No profile found, using fallback data');
-          loadFallbackData();
-        }
-      } catch (error: any) {
-        console.error('Error in direct profile fetch:', error);
-        setFetchError(`Error loading profile: ${error.message}`);
-        loadFallbackData();
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const loadFallbackData = () => {
-      // Use user metadata as fallback
-      const metadata = user?.user_metadata || {};
-      const defaultName = metadata.full_name || metadata.fullName || user?.email?.split('@')[0] || '';
-      const defaultOrg = metadata.organization || '';
-      
-      console.log('Using fallback data from user metadata:', metadata);
+    if (!user) return;
+    
+    console.log('Loading profile data for user:', user);
+    
+    // Check if we have userProfile from context
+    if (userProfile) {
+      console.log('Setting form values from userProfile:', userProfile);
+      form.reset({
+        full_name: userProfile.full_name || '',
+        display_name: userProfile.display_name || '',
+        phone_number: userProfile.phone_number || '',
+        organization_name: userProfile.organization_name || '',
+        organization_role: userProfile.organization_role || '',
+        avatar_url: userProfile.avatar_url || '',
+        email_notifications: userProfile.email_notifications ?? true,
+        sms_notifications: userProfile.sms_notifications ?? false,
+      });
+      return;
+    }
+    
+    // Fallback to user metadata if no profile is available
+    if (user.user_metadata) {
+      const metadata = user.user_metadata;
+      console.log('Using user metadata as fallback:', metadata);
       
       form.reset({
-        full_name: defaultName,
-        display_name: '',
-        phone_number: '',
-        organization_name: defaultOrg,
-        organization_role: '',
-        avatar_url: '',
+        full_name: metadata.full_name || '',
+        display_name: metadata.display_name || '',
+        phone_number: metadata.phone_number || '',
+        organization_name: metadata.organization_name || '',
+        organization_role: metadata.organization_role || '',
+        avatar_url: metadata.avatar_url || '',
         email_notifications: true,
         sms_notifications: false,
       });
       
       toast({
         title: 'Using signup information',
-        description: 'We\'re using the information from your signup. Please complete your profile.',
-        variant: 'default',
+        description: 'Profile information loaded from your signup data.',
       });
-    };
-
-    if (user?.id) {
-      loadProfileData();
     }
   }, [user, userProfile, form, toast]);
 
   const onSubmit = async (values: ProfileFormValues) => {
+    if (!user?.id) {
+      toast({
+        title: 'Error',
+        description: 'User not authenticated',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setIsLoading(true);
     setSaveSuccess(false);
+    console.log('Submitting profile update with values:', values);
 
     try {
-      if (!user?.id) {
-        toast({
-          title: 'Error',
-          description: 'User not authenticated',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      console.log('Updating profile with values:', values);
-
-      const { data, error } = await supabase
+      // Check if profile exists
+      const { data: existingProfile, error: checkError } = await supabase
         .from('user_profiles')
         .select('id')
         .eq('id', user.id)
         .maybeSingle();
 
-      if (error) {
-        throw error;
+      if (checkError) {
+        throw checkError;
       }
 
       let updateError;
 
-      if (data) {
-        // Profile exists, update it
-        const { error: updateProfileError } = await supabase
+      if (existingProfile) {
+        console.log('Updating existing profile for user:', user.id);
+        // Update existing profile
+        const { error } = await supabase
           .from('user_profiles')
           .update({
             full_name: values.full_name,
@@ -229,10 +165,11 @@ const Settings = () => {
           })
           .eq('id', user.id);
 
-        updateError = updateProfileError;
+        updateError = error;
       } else {
-        // Profile doesn't exist, create it
-        const { error: insertProfileError } = await supabase
+        console.log('Creating new profile for user:', user.id);
+        // Create new profile
+        const { error } = await supabase
           .from('user_profiles')
           .insert({
             id: user.id,
@@ -248,13 +185,15 @@ const Settings = () => {
             role: user.user_metadata?.role || 'case_manager',
           });
 
-        updateError = insertProfileError;
+        updateError = error;
       }
 
       if (updateError) {
+        console.error('Error updating profile:', updateError);
         throw updateError;
       }
 
+      console.log('Profile updated successfully');
       setSaveSuccess(true);
       toast({
         title: 'Profile updated',
@@ -262,6 +201,7 @@ const Settings = () => {
       });
     } catch (error: any) {
       console.error('Error updating profile:', error);
+      setFetchError(error.message);
       toast({
         title: 'Error',
         description: error.message || 'Failed to update profile',
