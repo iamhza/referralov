@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { awsApiClient, ClientData } from '@/services/awsApiClient';
 import { useToast } from '@/hooks/use-toast';
@@ -7,6 +7,31 @@ import { useToast } from '@/hooks/use-toast';
 export function useClientData() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isApiAvailable, setIsApiAvailable] = useState<boolean | null>(null);
+  
+  // Check API availability on hook mount
+  useEffect(() => {
+    const checkApiConnection = async () => {
+      try {
+        const response = await awsApiClient.testConnection();
+        setIsApiAvailable(response.success);
+        
+        if (!response.success) {
+          console.error('API connection test failed:', response.error);
+          toast({
+            title: "API Connection Issue",
+            description: "Unable to connect to the client data API. Some features may be limited.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        setIsApiAvailable(false);
+        console.error('API connection check error:', error);
+      }
+    };
+    
+    checkApiConnection();
+  }, [toast]);
   
   // Use React Query to fetch and cache client data
   const { 
@@ -31,12 +56,24 @@ export function useClientData() {
       
       return response.data || [];
     },
-    // Only attempt to fetch if API_URL is configured
-    enabled: Boolean(import.meta.env.VITE_AWS_API_URL),
+    // Only attempt to fetch if API_URL is configured and API is available
+    enabled: Boolean(import.meta.env.VITE_AWS_API_URL) && isApiAvailable !== false,
+    // Add retry configuration
+    retry: 1,
+    retryDelay: 1000,
   });
 
   // Fetch a single client by ID
   const getClient = async (id: string): Promise<ClientData | null> => {
+    if (isApiAvailable === false) {
+      toast({
+        title: "API Unavailable",
+        description: "Cannot fetch client data while API is unavailable",
+        variant: "destructive",
+      });
+      return null;
+    }
+    
     const response = await awsApiClient.getClient(id);
     
     if (!response.success) {
@@ -119,6 +156,7 @@ export function useClientData() {
     isLoading,
     error,
     refetch,
+    isApiAvailable,
     getClient,
     createClient: createClientMutation.mutate,
     updateClient: updateClientMutation.mutate,
