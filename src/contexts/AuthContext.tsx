@@ -55,9 +55,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (session?.user) {
         fetchUserProfile(session.user.id);
+      } else {
+        // If no session, set loading to false without trying to fetch a profile
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => {
@@ -67,6 +68,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function fetchUserProfile(userId: string) {
     try {
+      // Only attempt to fetch profile if user is authenticated
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
+      
       console.log('Fetching user profile for:', userId);
       
       const { data, error } = await supabase
@@ -88,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUserRole(fallbackProfile.role);
           setUserProfile(fallbackProfile);
         }
+        setLoading(false);
         return;
       }
 
@@ -109,8 +117,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUserProfile(fallbackProfile);
         }
       }
+      setLoading(false);
     } catch (error) {
       console.error('Unexpected error fetching user profile:', error);
+      setLoading(false);
     }
   }
 
