@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (data.user) {
         if (data.user.id) {
-          await fetchUserRole(data.user.id);
+          await fetchUserProfile(data.user.id);
         }
         
         toast({
