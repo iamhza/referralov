@@ -24,7 +24,7 @@ const LandingPage = () => {
                 <Link to="/provider">Provider Login</Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link to="/">Case Manager Portal</Link>
+                <Link to="/signin">Case Manager Sign In</Link>
               </Button>
             </div>
           </div>
@@ -47,8 +47,8 @@ const LandingPage = () => {
               className="bg-referra-500 hover:bg-referra-600 text-white h-14 px-8 text-lg"
               asChild
             >
-              <Link to="/">
-                Get Matched Now <ArrowRight className="ml-2 h-5 w-5" />
+              <Link to="/signin">
+                Case Manager Sign In <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button 
@@ -128,8 +128,8 @@ const LandingPage = () => {
                 className="mt-8 bg-referra-500 hover:bg-referra-600"
                 asChild
               >
-                <Link to="/">
-                  Start Using Referra <ArrowRight className="ml-2 h-4 w-4" />
+                <Link to="/signin">
+                  Sign In as Case Manager <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>

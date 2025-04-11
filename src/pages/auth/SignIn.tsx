@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -27,20 +26,14 @@ const SignIn = () => {
     try {
       // For demo purposes - simulate login
       setTimeout(() => {
-        // In a real app, this would be a Supabase auth call
-        const userType = email.includes('provider') ? 'provider' : 'case-manager';
-        
+        // Default to case-manager for this path
         toast({
           title: "Signed in successfully",
           description: "Welcome back to Referra",
         });
         
-        // Redirect based on user type
-        if (userType === 'provider') {
-          navigate('/provider');
-        } else {
-          navigate('/case-manager');
-        }
+        // Redirect to case manager dashboard
+        navigate('/case-manager');
       }, 1000);
     } catch (err) {
       setError('Invalid email or password. Please try again.');
