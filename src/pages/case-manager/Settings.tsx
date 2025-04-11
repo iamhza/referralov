@@ -51,7 +51,7 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -74,31 +74,60 @@ const Settings = () => {
 
   // Fetch user profile data
   useEffect(() => {
-    const fetchProfile = async () => {
+    const loadProfileData = () => {
       if (!user?.id) return;
       
       setIsLoading(true);
       setFetchError(null);
       
       try {
-        console.log('Fetching profile for user ID:', user.id);
+        console.log('Loading profile data for user ID:', user.id);
         
+        // First check if we already have the profile data in context
+        if (userProfile) {
+          console.log('Profile data loaded from context:', userProfile);
+          // Fill the form with the profile data from context
+          form.reset({
+            full_name: userProfile.full_name || '',
+            display_name: userProfile.display_name || '',
+            phone_number: userProfile.phone_number || '',
+            organization_name: userProfile.organization_name || '',
+            organization_role: userProfile.organization_role || '',
+            avatar_url: userProfile.avatar_url || '',
+            email_notifications: userProfile.email_notifications ?? true,
+            sms_notifications: userProfile.sms_notifications ?? false,
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        // If not in context, fetch directly (as a fallback)
+        fetchProfileDirectly();
+        
+      } catch (error: any) {
+        console.error('Unexpected error loading profile:', error);
+        setFetchError(`An unexpected error occurred: ${error.message}`);
+        setIsLoading(false);
+      }
+    };
+
+    const fetchProfileDirectly = async () => {
+      try {
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', user?.id)
           .maybeSingle();
 
         if (error) {
-          console.error('Error fetching profile:', error);
+          console.error('Error fetching profile directly:', error);
           setFetchError(`Could not load profile data: ${error.message}`);
-          setIsLoading(false);
+          loadFallbackData();
           return;
         }
 
         if (data) {
-          console.log('Profile data loaded:', data);
-          // Fill the form with the profile data
+          console.log('Profile data loaded directly:', data);
           form.reset({
             full_name: data.full_name || '',
             display_name: data.display_name || '',
@@ -110,42 +139,48 @@ const Settings = () => {
             sms_notifications: data.sms_notifications ?? false,
           });
         } else {
-          console.log('No profile found for user ID:', user.id);
-          
-          // Use user metadata as fallback for some fields
-          const metadata = user.user_metadata || {};
-          const defaultName = metadata.full_name || metadata.fullName || user.email?.split('@')[0] || '';
-          const defaultOrg = metadata.organization || '';
-          
-          toast({
-            title: 'Profile not found',
-            description: 'Your profile information could not be found. Please fill in your details.',
-            variant: 'destructive',
-          });
-          
-          form.reset({
-            full_name: defaultName,
-            display_name: '',
-            phone_number: '',
-            organization_name: defaultOrg,
-            organization_role: '',
-            avatar_url: '',
-            email_notifications: true,
-            sms_notifications: false,
-          });
+          console.log('No profile found, using fallback data');
+          loadFallbackData();
         }
       } catch (error: any) {
-        console.error('Unexpected error:', error);
-        setFetchError(`An unexpected error occurred: ${error.message}`);
+        console.error('Error in direct profile fetch:', error);
+        setFetchError(`Error loading profile: ${error.message}`);
+        loadFallbackData();
       } finally {
         setIsLoading(false);
       }
     };
 
+    const loadFallbackData = () => {
+      // Use user metadata as fallback
+      const metadata = user?.user_metadata || {};
+      const defaultName = metadata.full_name || metadata.fullName || user?.email?.split('@')[0] || '';
+      const defaultOrg = metadata.organization || '';
+      
+      console.log('Using fallback data from user metadata:', metadata);
+      
+      form.reset({
+        full_name: defaultName,
+        display_name: '',
+        phone_number: '',
+        organization_name: defaultOrg,
+        organization_role: '',
+        avatar_url: '',
+        email_notifications: true,
+        sms_notifications: false,
+      });
+      
+      toast({
+        title: 'Using signup information',
+        description: 'We\'re using the information from your signup. Please complete your profile.',
+        variant: 'default',
+      });
+    };
+
     if (user?.id) {
-      fetchProfile();
+      loadProfileData();
     }
-  }, [user, form, toast]);
+  }, [user, userProfile, form, toast]);
 
   const onSubmit = async (values: ProfileFormValues) => {
     setIsLoading(true);

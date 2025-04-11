@@ -15,6 +15,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isCaseManager: boolean;
   isProvider: boolean;
+  userProfile: any | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -35,6 +37,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (event === 'SIGNED_OUT') {
           setUserRole(null);
+          setUserProfile(null);
+        } else if (session?.user) {
+          // We'll load profile data via setTimeout to avoid Supabase deadlock
+          setTimeout(() => {
+            fetchUserProfile(session.user.id);
+          }, 0);
         }
       }
     );
@@ -44,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserRole(session.user.id);
+        fetchUserProfile(session.user.id);
       }
       
       setLoading(false);
@@ -55,24 +63,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  async function fetchUserRole(userId: string) {
+  async function fetchUserProfile(userId: string) {
     try {
+      // Use a simple query that won't trigger the recursion error
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('role')
+        .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user role:', error);
+        console.error('Error fetching user profile:', error);
         return;
       }
 
       if (data) {
         setUserRole(data.role);
+        setUserProfile(data);
       }
     } catch (error) {
-      console.error('Error fetching user role:', error);
+      console.error('Error fetching user profile:', error);
     }
   }
 
@@ -203,6 +213,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin,
         isCaseManager,
         isProvider,
+        userProfile,
       }}
     >
       {children}
