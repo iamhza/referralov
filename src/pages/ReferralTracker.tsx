@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
@@ -25,14 +24,13 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import DashboardLayout from '@/layouts/DashboardLayout';
-import { MessagePanel } from '@/components/messages/MessagePanel';
+import { MessagePanel, MessageButton } from '@/components/messages/MessagePanel';
 import ReferralCommunicationPanel from '@/components/referrals/ReferralCommunicationPanel';
 
 const ReferralTracker = () => {
   const { referralId } = useParams<{ referralId: string }>();
   const [showMessages, setShowMessages] = useState(false);
   
-  // Mock data for the UI
   const referral = {
     id: referralId || '123',
     client: 'John Smith',
@@ -137,7 +135,6 @@ const ReferralTracker = () => {
     <DashboardLayout>
       <div className="px-4 sm:px-6 lg:px-8 py-6 bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* Header Section */}
           <div className="flex flex-col gap-6">
             <Button variant="ghost" size="sm" className="w-fit" asChild>
               <Link to="/" className="flex items-center text-gray-600 hover:text-gray-900">
@@ -177,7 +174,6 @@ const ReferralTracker = () => {
             </div>
           </div>
           
-          {/* Progress Section */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle>Service Progress</CardTitle>
@@ -257,7 +253,6 @@ const ReferralTracker = () => {
             </CardContent>
           </Card>
           
-          {/* Tabs Section */}
           <Tabs defaultValue="communication">
             <TabsList className="mb-4">
               <TabsTrigger value="communication">Communication</TabsTrigger>
@@ -279,12 +274,10 @@ const ReferralTracker = () => {
                   <div className="space-y-6">
                     {referral.recentActivity.map((activity, index) => (
                       <div key={index} className="relative pl-6 pb-6">
-                        {/* Timeline connector */}
                         {index < referral.recentActivity.length - 1 && (
                           <div className="absolute top-0 left-2.5 bottom-0 w-px bg-gray-200"></div>
                         )}
                         
-                        {/* Activity indicator */}
                         <div className={`absolute top-0 left-0 w-5 h-5 rounded-full flex items-center justify-center ${getActorColor(activity.actor)}`}>
                           {getActivityIcon(activity.type)}
                         </div>
@@ -323,7 +316,6 @@ const ReferralTracker = () => {
         </div>
       </div>
       
-      {/* Chat message panel */}
       <MessageButton showMessages={showMessages} setShowMessages={setShowMessages} unreadCount={2} />
       <MessagePanel showMessages={showMessages} setShowMessages={setShowMessages} />
     </DashboardLayout>

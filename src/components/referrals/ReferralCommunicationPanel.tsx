@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   MessageSquare, 
@@ -155,9 +154,9 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
             ...task.comments,
             {
               id: `c${Date.now()}`,
-              userId: 'cm1', // Assuming logged in as case manager
+              userId: 'cm1',
               userName: 'Sarah Johnson',
-              userRole: 'case_manager',
+              userRole: 'case_manager' as const,
               content: newComment.trim(),
               timestamp: new Date().toISOString()
             }
