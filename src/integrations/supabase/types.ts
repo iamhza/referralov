@@ -580,7 +580,15 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      match_response_type: "pending" | "accepted" | "declined"
+      referral_status_type:
+        | "pending"
+        | "matched"
+        | "active"
+        | "completed"
+        | "rejected"
+      referral_urgency_type: "low" | "medium" | "high"
+      user_role_type: "case_manager" | "provider" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -695,6 +703,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      match_response_type: ["pending", "accepted", "declined"],
+      referral_status_type: [
+        "pending",
+        "matched",
+        "active",
+        "completed",
+        "rejected",
+      ],
+      referral_urgency_type: ["low", "medium", "high"],
+      user_role_type: ["case_manager", "provider", "admin"],
+    },
   },
 } as const

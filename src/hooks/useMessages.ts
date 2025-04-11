@@ -1,136 +1,80 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Message, MessageFormData } from '@/types/message';
-import { messageService } from '@/services/messageService';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { sendMessage, getMessagesByReferralId, markMessageAsRead } from '@/services/messageService';
+import { useAuth } from '@/contexts/AuthContext';
 
-export function useMessages(referralId?: number) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const { toast } = useToast();
+export function useMessages(referralId: number) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [newMessage, setNewMessage] = useState<string>('');
 
-  // Fetch messages for a specific referral
-  const fetchMessages = useCallback(async (id?: number) => {
-    if (!id) return;
-    
-    setIsLoading(true);
-    try {
-      const messagesData = await messageService.getMessages(id);
-      setMessages(messagesData);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      toast({
-        title: 'Error loading messages',
-        description: 'Failed to load message history',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
+  const { 
+    data: messages = [], 
+    isLoading, 
+    error, 
+    refetch 
+  } = useQuery({
+    queryKey: ['messages', referralId],
+    queryFn: () => getMessagesByReferralId(referralId),
+    enabled: !!referralId,
+  });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: (messageData: MessageFormData) => sendMessage(messageData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', referralId] });
+      setNewMessage('');
     }
-  }, [toast]);
+  });
 
-  // Send a new message
-  const sendMessage = useCallback(async (data: MessageFormData): Promise<boolean> => {
-    try {
-      const newMessage = await messageService.sendMessage(data);
-      
-      if (newMessage) {
-        setMessages(prev => [...prev, newMessage]);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: 'Message not sent',
-        description: 'There was a problem sending your message',
-        variant: 'destructive',
-      });
-      return false;
+  const readMessageMutation = useMutation({
+    mutationFn: markMessageAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', referralId] });
     }
-  }, [toast]);
+  });
 
-  // Mark messages as read
-  const markMessagesAsRead = useCallback(async () => {
-    // Get unread messages that are sent to current user
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    
-    const unreadMessages = messages
-      .filter(msg => !msg.read && msg.recipient_id === session.user.id)
-      .map(msg => msg.id);
-      
-    if (unreadMessages.length === 0) return;
-    
-    const success = await messageService.markAsRead(unreadMessages);
-    
-    if (success) {
-      setMessages(prev => 
-        prev.map(msg => 
-          unreadMessages.includes(msg.id) ? { ...msg, read: true } : msg
-        )
-      );
-      // Refresh unread count
-      fetchUnreadCount();
-    }
-  }, [messages]);
+  const handleSendMessage = (recipientId?: string) => {
+    if (!user || !newMessage.trim()) return;
 
-  // Get unread message count
-  const fetchUnreadCount = useCallback(async () => {
-    try {
-      const count = await messageService.getUnreadCount();
-      setUnreadCount(count);
-    } catch (error) {
-      console.error('Error fetching unread count:', error);
-    }
-  }, []);
-
-  // Load messages when referral ID changes
-  useEffect(() => {
-    if (referralId) {
-      fetchMessages(referralId);
-    }
-  }, [referralId, fetchMessages]);
-
-  // Get initial unread count
-  useEffect(() => {
-    fetchUnreadCount();
-  }, [fetchUnreadCount]);
-
-  // Set up subscription to messages table
-  useEffect(() => {
-    const subscription = supabase
-      .channel('messages_changes')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => {
-          const newMessage = payload.new as unknown as Message;
-          
-          // Only add the message if it's for the current referral
-          if (referralId && newMessage.referral_id === referralId) {
-            setMessages(prev => [...prev, newMessage]);
-          }
-          
-          // Update unread count if needed
-          fetchUnreadCount();
-        }
-      )
-      .subscribe();
-    
-    return () => {
-      supabase.removeChannel(subscription);
+    const messageData: MessageFormData = {
+      content: newMessage.trim(),
+      referral_id: referralId,
+      sender_id: user.id,
     };
-  }, [referralId, fetchUnreadCount]);
+
+    if (recipientId) {
+      messageData.recipient_id = recipientId;
+    }
+
+    sendMessageMutation.mutate(messageData);
+  };
+
+  const handleMarkAsRead = (messageId: string) => {
+    readMessageMutation.mutate(messageId);
+  };
+
+  // Auto-mark messages as read when viewed
+  useEffect(() => {
+    if (user && messages.length > 0) {
+      messages.forEach(message => {
+        if (message.recipient_id === user.id && !message.read) {
+          handleMarkAsRead(message.id);
+        }
+      });
+    }
+  }, [messages, user]);
 
   return {
     messages,
     isLoading,
-    unreadCount,
-    sendMessage,
-    fetchMessages,
-    markMessagesAsRead,
+    error,
+    newMessage,
+    setNewMessage,
+    sendMessage: handleSendMessage,
+    markAsRead: handleMarkAsRead,
+    refetchMessages: refetch
   };
 }
