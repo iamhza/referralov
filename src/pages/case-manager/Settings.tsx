@@ -81,10 +81,12 @@ const Settings = () => {
       try {
         if (!user?.id) {
           setFetchError("User not authenticated. Please sign in again.");
+          setIsLoading(false);
           return;
         }
 
-        // Use our security definer function to avoid RLS recursion
+        console.log('Fetching profile for user ID:', user.id);
+        
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
@@ -94,6 +96,7 @@ const Settings = () => {
         if (error) {
           console.error('Error fetching profile:', error);
           setFetchError(`Could not load profile data: ${error.message}`);
+          setIsLoading(false);
           return;
         }
 
@@ -151,7 +154,7 @@ const Settings = () => {
           }
         }
       } catch (error: any) {
-        console.error('Error:', error);
+        console.error('Unexpected error:', error);
         setFetchError(`An unexpected error occurred: ${error.message}`);
       } finally {
         setIsLoading(false);
