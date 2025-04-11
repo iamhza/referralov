@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -147,8 +148,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: 'Account created',
           description: 'Please check your email to confirm your account',
         });
-        
-        return data;
+        // We won't return the data object to match the Promise<void> return type
       }
     } catch (error: any) {
       toast({
