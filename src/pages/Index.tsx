@@ -28,15 +28,12 @@ const Index = () => {
         {/* Actions & Providers Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <OpenReferrals />
-          </div>
-          <div>
             <ActionPanel />
           </div>
+          <div>
+            <FeaturedProviders />
+          </div>
         </div>
-        
-        {/* Featured Providers */}
-        <FeaturedProviders />
       </div>
     </DashboardLayout>
   );
