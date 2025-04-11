@@ -28,6 +28,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // This flag helps prevent fetching profiles on the public landing page
+  const [isAuthRoute, setIsAuthRoute] = useState(false);
+  
+  useEffect(() => {
+    // Check if the current route is an authenticated route
+    const currentPath = window.location.pathname;
+    const publicRoutes = ['/', '/signin', '/signup', '/admin/login'];
+    setIsAuthRoute(!publicRoutes.includes(currentPath));
+  }, []);
 
   useEffect(() => {
     // Set up the auth state change listener first
@@ -39,7 +49,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_OUT') {
           setUserRole(null);
           setUserProfile(null);
-        } else if (session?.user) {
+        } else if (session?.user && isAuthRoute) {
+          // Only fetch profile on authenticated routes
           // Defer profile fetching to avoid Supabase deadlock
           setTimeout(() => {
             fetchUserProfile(session.user.id);
@@ -53,10 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       
-      if (session?.user) {
+      if (session?.user && isAuthRoute) {
+        // Only fetch profile on authenticated routes
         fetchUserProfile(session.user.id);
       } else {
-        // If no session, set loading to false without trying to fetch a profile
+        // If no session or on public route, set loading to false without fetching profile
         setLoading(false);
       }
     });
@@ -64,12 +76,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [isAuthRoute]);
 
   async function fetchUserProfile(userId: string) {
     try {
       // Only attempt to fetch profile if user is authenticated
-      if (!userId) {
+      if (!userId || !isAuthRoute) {
         setLoading(false);
         return;
       }

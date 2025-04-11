@@ -2,9 +2,12 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useClientData(clientId?: string) {
   const [searchTerm, setSearchTerm] = useState('');
+  const { session } = useAuth();
+  const isAuthenticated = !!session;
 
   const {
     data: client,
@@ -13,7 +16,7 @@ export function useClientData(clientId?: string) {
   } = useQuery({
     queryKey: ['client', clientId],
     queryFn: async () => {
-      if (!clientId) return null;
+      if (!clientId || !isAuthenticated) return null;
 
       const { data, error } = await supabase
         .from('user_profiles')
@@ -24,7 +27,7 @@ export function useClientData(clientId?: string) {
       if (error) throw error;
       return data;
     },
-    enabled: !!clientId,
+    enabled: !!clientId && isAuthenticated,
   });
 
   const {
@@ -34,6 +37,8 @@ export function useClientData(clientId?: string) {
   } = useQuery({
     queryKey: ['clients', searchTerm],
     queryFn: async () => {
+      if (!isAuthenticated) return [];
+
       let query = supabase.from('user_profiles').select('*');
 
       if (searchTerm) {
@@ -45,6 +50,7 @@ export function useClientData(clientId?: string) {
       if (error) throw error;
       return data || [];
     },
+    enabled: isAuthenticated,
   });
 
   return {
