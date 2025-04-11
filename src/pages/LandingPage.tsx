@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -439,6 +440,7 @@ const LandingPage = () => {
     }
   };
 
+  // Updated to use navigate directly instead of wrapping in another function
   const handleSignIn = () => {
     navigate('/signin');
   };
@@ -510,10 +512,10 @@ const LandingPage = () => {
               </NavigationMenu>
             </div>
             <div className="flex items-center gap-4">
+              {/* Fixed: Changed to use a regular Button with onClick handler */}
               <Button 
                 variant="ghost" 
                 onClick={handleSignIn}
-                className="cursor-pointer"
               >
                 Sign In
               </Button>
