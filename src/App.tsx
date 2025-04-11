@@ -23,6 +23,13 @@ import ProviderDashboard from "./pages/provider/Dashboard";
 import ProviderReferrals from "./pages/provider/Referrals";
 import ProviderReferralTracker from "./pages/provider/ReferralTracker";
 
+// Admin pages
+import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminReferrals from "./pages/admin/Referrals";
+import AdminUserManagement from "./pages/admin/UserManagement";
+import AdminReferralMatching from "./pages/admin/ReferralMatching";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -48,6 +55,13 @@ const App = () => (
           <Route path="/provider" element={<ProviderDashboard />} />
           <Route path="/provider/referrals" element={<ProviderReferrals />} />
           <Route path="/provider/referral-tracker/:referralId" element={<ProviderReferralTracker />} />
+          
+          {/* Admin routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/referrals" element={<AdminReferrals />} />
+          <Route path="/admin/users" element={<AdminUserManagement />} />
+          <Route path="/admin/referral-matching/:referralId" element={<AdminReferralMatching />} />
           
           {/* Redirect old routes to new structured routes */}
           <Route path="/referrals" element={<Navigate to="/case-manager/referrals" replace />} />
