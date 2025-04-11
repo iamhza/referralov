@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -444,6 +443,10 @@ const LandingPage = () => {
     navigate('/signin');
   };
 
+  const handleGetStarted = () => {
+    navigate('/signup');
+  };
+
   const AnnouncementBanner = () => (
     <div className="inline-flex items-center gap-2 rounded-full bg-referra-50 border border-referra-100 px-4 py-1.5 text-sm font-medium text-referra-700">
       <Badge className="bg-referra-200 text-referra-700 hover:bg-referra-200 px-2 py-0.5 text-[11px]">NEW</Badge>
@@ -514,8 +517,12 @@ const LandingPage = () => {
               >
                 Sign In
               </Button>
-              <Button variant="default" className="bg-referra-500 hover:bg-referra-600" asChild>
-                <Link to="/signup">Get Started</Link>
+              <Button 
+                variant="default" 
+                className="bg-referra-500 hover:bg-referra-600" 
+                onClick={handleGetStarted}
+              >
+                Get Started
               </Button>
             </div>
           </div>
