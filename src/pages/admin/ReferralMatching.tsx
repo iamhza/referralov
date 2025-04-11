@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -28,7 +27,7 @@ import {
   Briefcase,
   FileCheck,
   Languages,
-  Wheelchair,
+  Accessibility,
   CircleCheck
 } from 'lucide-react';
 
@@ -41,7 +40,6 @@ const ReferralMatching = () => {
   const [filterInsurance, setFilterInsurance] = useState(true);
   const [filterAvailability, setFilterAvailability] = useState(true);
   
-  // Mock referral data
   const referral = {
     id: referralId,
     service: "Adult rehabilitative mental health services (ARMHS)",
@@ -65,7 +63,6 @@ const ReferralMatching = () => {
     notes: "Client is looking for services to help maintain independence in the community. Has previously had ARMHS services but provider left the field. Prefers female provider if possible."
   };
   
-  // Mock providers data
   const providers = [
     {
       id: "p1",
@@ -129,14 +126,12 @@ const ReferralMatching = () => {
     }
   ];
   
-  // Filter providers based on search and other filters
   const filteredProviders = providers.filter(provider => {
     const matchesSearch = 
       searchTerm === '' || 
       provider.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       provider.services.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    // Apply additional filters
     const matchesDistance = !filterDistance || provider.distance.includes("miles");
     const matchesInsurance = !filterInsurance || provider.insurances.some(ins => 
       referral.client.insurances.includes(ins)
@@ -146,7 +141,6 @@ const ReferralMatching = () => {
     return matchesSearch && matchesDistance && matchesInsurance && matchesAvailability;
   });
   
-  // Sort providers by match score
   const sortedProviders = [...filteredProviders].sort((a, b) => b.matchScore - a.matchScore);
   
   const handleSelectProvider = (providerId: string) => {
@@ -167,13 +161,11 @@ const ReferralMatching = () => {
       return;
     }
     
-    // In a real app, this would call an API to match the providers
     toast({
       title: "Providers matched successfully",
       description: `${selectedProviders.length} provider(s) have been matched with referral #${referralId}.`,
     });
     
-    // Clear selections
     setSelectedProviders([]);
   };
   
@@ -231,7 +223,6 @@ const ReferralMatching = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Referral Details */}
           <div className="lg:col-span-1">
             <Card className="border-none shadow-sm mb-6 sticky top-20">
               <CardHeader className="pb-2">
@@ -330,7 +321,6 @@ const ReferralMatching = () => {
             </Card>
           </div>
           
-          {/* Provider Matching */}
           <div className="lg:col-span-2">
             <Card className="border-none shadow-sm mb-6">
               <CardHeader className="pb-2">
@@ -552,7 +542,6 @@ const ReferralMatching = () => {
                     {sortedProviders.sort((a, b) => 
                       parseFloat(a.distance.split(' ')[0]) - parseFloat(b.distance.split(' ')[0])
                     ).map((provider) => (
-                      // Similar provider card structure as above
                       <div key={provider.id} className="border rounded-lg p-4">
                         <h3 className="font-medium">{provider.name}</h3>
                         <p className="text-sm text-gray-500">{provider.distance}</p>
@@ -562,7 +551,6 @@ const ReferralMatching = () => {
                   
                   <TabsContent value="availability" className="space-y-4">
                     {sortedProviders.sort((a, b) => b.availableSlots - a.availableSlots).map((provider) => (
-                      // Similar provider card structure as above
                       <div key={provider.id} className="border rounded-lg p-4">
                         <h3 className="font-medium">{provider.name}</h3>
                         <p className="text-sm text-gray-500">{provider.availableSlots} available slots</p>
