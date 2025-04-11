@@ -30,6 +30,8 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const profileFormSchema = z.object({
   full_name: z.string().min(2, {
@@ -53,6 +55,7 @@ const Settings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -72,22 +75,24 @@ const Settings = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       setIsLoading(true);
+      setFetchError(null);
+      
       try {
-        if (!user?.id) return;
+        if (!user?.id) {
+          setFetchError("User not authenticated. Please sign in again.");
+          return;
+        }
 
+        // Use a direct query without RLS to avoid policy recursion issues
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching profile:', error);
-          toast({
-            title: 'Error',
-            description: 'Could not load profile data',
-            variant: 'destructive',
-          });
+          setFetchError(`Could not load profile data: ${error.message}`);
           return;
         }
 
@@ -99,12 +104,38 @@ const Settings = () => {
             organization_name: data.organization_name || '',
             organization_role: data.organization_role || '',
             avatar_url: data.avatar_url || '',
-            email_notifications: data.email_notifications,
-            sms_notifications: data.sms_notifications,
+            email_notifications: data.email_notifications ?? true,
+            sms_notifications: data.sms_notifications ?? false,
           });
+        } else {
+          // If no profile exists yet, create a basic one
+          const { error: createError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: user.id,
+              full_name: user.email?.split('@')[0] || '',
+              role: 'case_manager'
+            });
+            
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            setFetchError(`Could not create profile: ${createError.message}`);
+          } else {
+            form.reset({
+              full_name: user.email?.split('@')[0] || '',
+              display_name: '',
+              phone_number: '',
+              organization_name: '',
+              organization_role: '',
+              avatar_url: '',
+              email_notifications: true,
+              sms_notifications: false,
+            });
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error:', error);
+        setFetchError(`An unexpected error occurred: ${error.message}`);
       } finally {
         setIsLoading(false);
       }
@@ -117,7 +148,14 @@ const Settings = () => {
     setIsLoading(true);
 
     try {
-      if (!user?.id) return;
+      if (!user?.id) {
+        toast({
+          title: 'Error',
+          description: 'User not authenticated',
+          variant: 'destructive',
+        });
+        return;
+      }
 
       const { error } = await supabase
         .from('user_profiles')
@@ -167,6 +205,14 @@ const Settings = () => {
           </div>
 
           <Separator />
+
+          {fetchError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{fetchError}</AlertDescription>
+            </Alert>
+          )}
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
