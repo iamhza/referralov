@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Card, 
   CardContent, 
@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const SignUp = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -51,11 +52,12 @@ const SignUp = () => {
         role,
         organization,
       });
-      setSuccess(true);
       toast({
         title: "Account created",
         description: "Please check your email to confirm your account",
       });
+      // Redirect to signin page after successful registration
+      navigate('/signin');
     } catch (error: any) {
       toast({
         title: "Sign up failed",
@@ -63,6 +65,7 @@ const SignUp = () => {
         variant: "destructive",
       });
       console.error("Signup error:", error);
+      setSuccess(false);
     } finally {
       setIsLoading(false);
     }

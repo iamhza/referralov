@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,7 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -40,7 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -95,7 +92,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        // First fetch the user role to determine where to navigate
         if (data.user.id) {
           await fetchUserRole(data.user.id);
         }
@@ -105,7 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: `Welcome back, ${data.user.email}!`,
         });
         
-        // Navigate based on role - using a timeout to allow the role to be fetched
         setTimeout(() => {
           if (userRole === 'admin') {
             navigate('/admin');
@@ -153,8 +148,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: 'Please check your email to confirm your account',
         });
         
-        // Don't automatically redirect if email confirmation is required
-        // Instead, show the success screen in the SignUp component
+        return data;
       }
     } catch (error: any) {
       toast({
@@ -162,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: error.message,
         variant: 'destructive',
       });
+      throw error;
     }
   };
 
