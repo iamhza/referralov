@@ -23,7 +23,7 @@ const CaseManagerDashboard = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Welcome, {userName}</h1>
-                <p className="text-gray-500 mt-1">Manage your client referrals</p>
+                <p className="text-gray-500 mt-1">Manage your service referrals</p>
               </div>
               <Button className="bg-referra-500 hover:bg-referra-600" asChild>
                 <Link to="/case-manager/new-referral">

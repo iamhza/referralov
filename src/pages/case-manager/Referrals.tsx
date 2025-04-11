@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { 
@@ -14,8 +13,7 @@ import {
   CheckCircle2, 
   Clock, 
   Filter, 
-  Search, 
-  Users
+  Search
 } from 'lucide-react';
 
 const Referrals = () => {
@@ -77,7 +75,6 @@ const Referrals = () => {
             {[
               {
                 id: "REF-4851",
-                client: "James Wilson",
                 service: "Mental Health Counseling",
                 provider: "Minnesota Care Center",
                 date: "Apr 11, 2025",
@@ -86,7 +83,6 @@ const Referrals = () => {
               },
               {
                 id: "REF-4832",
-                client: "Maria Johnson",
                 service: "Substance Use Treatment",
                 provider: "Recovery Health Services",
                 date: "Apr 10, 2025",
@@ -95,7 +91,6 @@ const Referrals = () => {
               },
               {
                 id: "REF-4829",
-                client: "Robert Smith",
                 service: "Housing Support",
                 provider: "Community Housing Alliance",
                 date: "Apr 8, 2025",
@@ -135,10 +130,6 @@ const Referrals = () => {
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <Users className="h-3.5 w-3.5 mr-1" />
-                      Client: {referral.client}
-                    </span>
                     <span className="flex items-center">
                       <Calendar className="h-3.5 w-3.5 mr-1" />
                       Created: {referral.date}
@@ -197,10 +188,6 @@ const Referrals = () => {
                 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm text-gray-500">
                   <span className="flex items-center">
-                    <Users className="h-3.5 w-3.5 mr-1" />
-                    Client: Robert Smith
-                  </span>
-                  <span className="flex items-center">
                     <Calendar className="h-3.5 w-3.5 mr-1" />
                     Created: Apr 8, 2025
                   </span>
@@ -226,7 +213,6 @@ const Referrals = () => {
             {[
               {
                 id: "REF-4851",
-                client: "James Wilson",
                 service: "Mental Health Counseling",
                 provider: "Minnesota Care Center",
                 date: "Apr 11, 2025",
@@ -235,7 +221,6 @@ const Referrals = () => {
               },
               {
                 id: "REF-4832",
-                client: "Maria Johnson",
                 service: "Substance Use Treatment",
                 provider: "Recovery Health Services",
                 date: "Apr 10, 2025",
@@ -267,10 +252,6 @@ const Referrals = () => {
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <Users className="h-3.5 w-3.5 mr-1" />
-                      Client: {referral.client}
-                    </span>
                     <span className="flex items-center">
                       <Calendar className="h-3.5 w-3.5 mr-1" />
                       Created: {referral.date}
@@ -323,10 +304,6 @@ const Referrals = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm text-gray-500">
-                  <span className="flex items-center">
-                    <Users className="h-3.5 w-3.5 mr-1" />
-                    Client: Robert Smith
-                  </span>
                   <span className="flex items-center">
                     <Calendar className="h-3.5 w-3.5 mr-1" />
                     Created: Apr 8, 2025

@@ -1,14 +1,13 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Clock, Users, ArrowRight, Calendar, CheckCircle2 } from 'lucide-react';
+import { Flame, Clock, ArrowRight, Calendar, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 interface ReferralCardProps {
   id: string;
-  clientName: string;
   service: string;
   urgency: 'high' | 'medium' | 'low';
   timeInStage: string;
@@ -23,7 +22,6 @@ const OpenReferrals = () => {
   const referrals: ReferralCardProps[] = [
     {
       id: '1',
-      clientName: 'John Smith',
       service: 'Adult rehabilitative mental health services (ARMHS)',
       urgency: 'high',
       timeInStage: '2 days',
@@ -32,7 +30,6 @@ const OpenReferrals = () => {
     },
     {
       id: '2',
-      clientName: 'Maria Garcia',
       service: 'Housing stabilization services (HSS)',
       urgency: 'medium',
       timeInStage: '1 day',
@@ -40,7 +37,6 @@ const OpenReferrals = () => {
     },
     {
       id: '3',
-      clientName: 'David Lee',
       service: 'Opioid treatment – non-residential',
       urgency: 'high',
       timeInStage: '3 days',
@@ -49,7 +45,6 @@ const OpenReferrals = () => {
     },
     {
       id: '4',
-      clientName: 'Sarah Johnson',
       service: 'Family training',
       urgency: 'low',
       timeInStage: '5 days',
@@ -90,7 +85,6 @@ const OpenReferrals = () => {
 
 const ReferralCard: React.FC<ReferralCardProps> = ({ 
   id, 
-  clientName, 
   service, 
   urgency, 
   timeInStage, 
@@ -115,7 +109,7 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 
   const stageIcons = {
     pending: <Clock className="h-4 w-4 mr-2" />,
-    matched: <Users className="h-4 w-4 mr-2" />,
+    matched: <CheckCircle2 className="h-4 w-4 mr-2" />,
     active: <Calendar className="h-4 w-4 mr-2" />,
     completed: <CheckCircle2 className="h-4 w-4 mr-2" />
   };
@@ -134,9 +128,7 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
     <div className="border rounded-lg p-5 hover:shadow-md transition-all duration-200 bg-white">
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
-          <h3 className="font-medium text-gray-900 flex items-center">
-            {clientName}
-          </h3>
+          <h3 className="font-medium text-gray-900">Referral #{id}</h3>
           <p className="text-sm text-gray-600 mt-1 line-clamp-1">{service}</p>
         </div>
         <Badge className={`ml-2 ${urgencyColors[urgency]}`}>
@@ -153,7 +145,7 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
         
         {stage === 'matched' && providersCount && (
           <div className="flex items-center">
-            <Users className="h-4 w-4 mr-2 text-gray-400" />
+            <CheckCircle2 className="h-4 w-4 mr-2 text-gray-400" />
             <span>{providersCount} providers matched</span>
           </div>
         )}
