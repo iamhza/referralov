@@ -449,7 +449,6 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-[#ecf4fc]">
-      {/* Navigation */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -514,15 +513,12 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="container mx-auto px-4 md:px-8 pt-16 md:pt-32 pb-16 relative">
         <div className="max-w-3xl mx-auto space-y-8 md:space-y-12">
-          {/* Announcement Banner */}
           <div className="flex justify-center">
             <AnnouncementBanner />
           </div>
 
-          {/* Hero Content */}
           <div className="space-y-6 md:space-y-8 text-center">
             <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-gray-900">
               Effortless <span className="bg-gradient-to-r from-referra-700 to-referra-500 bg-clip-text text-transparent">AI-Powered Referrals</span>
@@ -547,7 +543,6 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* CTA Button */}
             <div className="pt-4">
               <form onSubmit={handleStartNow} className="max-w-md mx-auto">
                 <div className="bg-white rounded-full p-1.5 flex items-center border-2 border-referra-200">
@@ -570,25 +565,20 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {/* Browser Window Mockup */}
         <div className="mt-16 md:mt-24 max-w-5xl mx-auto relative z-20">
           <div className="relative bg-white rounded-2xl shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15),0_0_60px_-20px_rgba(99,102,241,0.25)] overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
-            {/* Browser Chrome */}
             <div className="bg-[#f8fafc] border-b border-slate-200 px-6 py-3">
-              {/* Window Controls */}
               <div className="absolute left-4 top-[14px] flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]" />
                 <div className="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d4a032]" />
                 <div className="w-3 h-3 rounded-full bg-[#28c840] border border-[#27aa35]" />
               </div>
               
-              {/* URL Bar */}
               <div className="mx-auto max-w-sm bg-white/80 backdrop-blur-sm border border-slate-200 rounded-lg px-4 py-2 flex items-center gap-2">
                 <div className="flex-shrink-0 w-4 h-4 rounded-full bg-emerald-400" />
                 <span className="text-sm text-slate-400 font-medium">referra.ai</span>
               </div>
 
-              {/* Tab Bar */}
               <div className="flex items-center justify-center gap-1 mt-4 overflow-x-auto">
                 {[
                   { id: "dashboard" as TabId, label: "Dashboard", icon: BarChart3 },
@@ -611,20 +601,16 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Tab Content */}
             <div className="p-4 md:p-8 bg-white relative z-10">
               {renderTabContent(activeTab)}
             </div>
           </div>
           
-          {/* Shadow Decoration */}
           <div className="absolute -inset-x-20 -bottom-20 h-40 bg-gradient-to-t from-[#ecf4fc] to-transparent transform-gpu" />
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features" className="py-20 md:py-32 bg-white relative overflow-hidden">
-        {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
         
@@ -706,7 +692,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Character Introduction Section */}
       <section className="py-20 bg-gradient-to-b from-[#f0f4fc] to-white relative overflow-hidden">
         <div className="container mx-auto px-4 md:px-8">
           <div className="max-w-5xl mx-auto">
@@ -720,10 +705,8 @@ const LandingPage = () => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-12 items-center">
-              {/* Character Cards */}
               <div className="character-card relative bg-white p-8 rounded-2xl shadow-lg border border-slate-100 transform transition-all duration-500 hover:shadow-xl">
                 <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 flex items-center justify-center">
-                  {/* Casey Illustration */}
                   <div className="character-image relative w-full h-full">
                     <div className="w-28 h-28 bg-amber-100 rounded-full flex items-center justify-center text-2xl font-bold text-amber-800">
                       CM
@@ -759,7 +742,6 @@ const LandingPage = () => {
 
               <div className="character-card relative bg-white p-8 rounded-2xl shadow-lg border border-slate-100 transform transition-all duration-500 hover:shadow-xl">
                 <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 flex items-center justify-center">
-                  {/* Pat Illustration */}
                   <div className="character-image relative w-full h-full">
                     <div className="w-28 h-28 bg-blue-100 rounded-full flex items-center justify-center text-2xl font-bold text-blue-800">
                       SP
@@ -794,7 +776,6 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Solution Timeline */}
             <div className="mt-20 relative">
               <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-blue-100 -translate-x-1/2 z-0"></div>
               
@@ -848,7 +829,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Call to Action Section */}
       <section className="py-16 bg-referra-50">
         <div className="container mx-auto px-4 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
@@ -884,12 +864,10 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-white border-t border-gray-200">
         <div className="container mx-auto px-4 md:px-8 py-12">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
-              {/* Brand Column */}
               <div className="md:col-span-2 space-y-6">
                 <Link to="/" className="inline-flex items-center gap-2">
                   <Logo className="h-8 w-8" />
@@ -917,7 +895,6 @@ const LandingPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Solutions</h3>
                 <ul className="space-y-3">
@@ -937,7 +914,6 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Bottom Bar */}
             <div className="mt-12 pt-8 border-t border-gray-200">
               <p className="text-center text-sm text-gray-600">
                 © {new Date().getFullYear()} Referra. All rights reserved. Demo version for conference presentation.
