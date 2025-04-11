@@ -18,14 +18,19 @@ export function useClientData(clientId?: string) {
     queryFn: async () => {
       if (!clientId || !isAuthenticated) return null;
 
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', clientId)
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', clientId)
+          .maybeSingle();
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Error fetching client:', error);
+        return null;
+      }
     },
     enabled: !!clientId && isAuthenticated,
   });
@@ -39,16 +44,21 @@ export function useClientData(clientId?: string) {
     queryFn: async () => {
       if (!isAuthenticated) return [];
 
-      let query = supabase.from('user_profiles').select('*');
+      try {
+        let query = supabase.from('user_profiles').select('*');
 
-      if (searchTerm) {
-        query = query.ilike('full_name', `%${searchTerm}%`);
+        if (searchTerm) {
+          query = query.ilike('full_name', `%${searchTerm}%`);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+        return [];
       }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
     },
     enabled: isAuthenticated,
   });
