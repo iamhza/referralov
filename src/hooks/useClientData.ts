@@ -16,7 +16,7 @@ export function useClientData(clientId?: string) {
       if (!clientId) return null;
 
       const { data, error } = await supabase
-        .from('clients')
+        .from('user_profiles')
         .select('*')
         .eq('id', clientId)
         .single();
@@ -34,10 +34,10 @@ export function useClientData(clientId?: string) {
   } = useQuery({
     queryKey: ['clients', searchTerm],
     queryFn: async () => {
-      let query = supabase.from('clients').select('*');
+      let query = supabase.from('user_profiles').select('*');
 
       if (searchTerm) {
-        query = query.ilike('name', `%${searchTerm}%`);
+        query = query.ilike('full_name', `%${searchTerm}%`);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });

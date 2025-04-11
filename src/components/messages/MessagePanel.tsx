@@ -54,7 +54,7 @@ export const MessagePanel = ({ showMessages, setShowMessages }: MessagePanelProp
 
   // Mark messages as read when panel is opened
   useEffect(() => {
-    if (showMessages) {
+    if (showMessages && markMessagesAsRead) {
       markMessagesAsRead();
     }
   }, [showMessages, markMessagesAsRead]);
@@ -72,18 +72,13 @@ export const MessagePanel = ({ showMessages, setShowMessages }: MessagePanelProp
   }, []);
 
   const onSubmit = async (data: MessageFormValues) => {
-    if (!data.content.trim()) return;
+    if (!data.content.trim() || !user) return;
     
-    const success = await sendMessage({
-      content: data.content.trim(),
-      referral_id: 1001, // Example referral ID
-      // In a real app, you would use the actual recipient ID
-      recipient_id: 'provider-id-here' 
-    });
-
-    if (success) {
-      reset();
-    }
+    // Call the sendMessage method with proper parameters
+    sendMessage('provider-id-here'); // passing recipient_id as a separate parameter
+    
+    // Reset the form after sending
+    reset();
   };
 
   return (

@@ -43,17 +43,25 @@ export function useMessages(referralId: number) {
       content: newMessage.trim(),
       referral_id: referralId,
       sender_id: user.id,
+      recipient_id: recipientId
     };
-
-    if (recipientId) {
-      messageData.recipient_id = recipientId;
-    }
 
     sendMessageMutation.mutate(messageData);
   };
 
   const handleMarkAsRead = (messageId: string) => {
     readMessageMutation.mutate(messageId);
+  };
+
+  // Mark all messages as read
+  const markMessagesAsRead = () => {
+    if (user && messages.length > 0) {
+      messages.forEach(message => {
+        if (message.recipient_id === user.id && !message.read) {
+          handleMarkAsRead(message.id);
+        }
+      });
+    }
   };
 
   // Auto-mark messages as read when viewed
@@ -75,6 +83,7 @@ export function useMessages(referralId: number) {
     setNewMessage,
     sendMessage: handleSendMessage,
     markAsRead: handleMarkAsRead,
+    markMessagesAsRead,
     refetchMessages: refetch
   };
 }

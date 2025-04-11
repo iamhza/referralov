@@ -13,4 +13,5 @@ export interface MessageFormData {
   content: string;
   referral_id: number;
   recipient_id?: string;
+  sender_id: string;
 }

@@ -11,26 +11,29 @@ export function useReferrals(referralId?: string | number) {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [urgencyFilter, setUrgencyFilter] = useState<string | null>(null);
 
+  // Convert referralId to number if it's a string
+  const numericReferralId = typeof referralId === 'string' ? parseInt(referralId, 10) : referralId;
+
   // Get a single referral by ID
   const {
     data: referral,
     isLoading: isLoadingReferral,
     error: referralError,
   } = useQuery({
-    queryKey: ['referral', referralId],
+    queryKey: ['referral', numericReferralId],
     queryFn: async () => {
-      if (!referralId) return null;
+      if (!numericReferralId) return null;
 
       const { data, error } = await supabase
         .from('referrals')
         .select('*, user_profiles(*)')
-        .eq('id', referralId)
+        .eq('id', numericReferralId)
         .single();
 
       if (error) throw error;
       return data;
     },
-    enabled: !!referralId,
+    enabled: !!numericReferralId,
   });
 
   // Get all referrals with filters
@@ -99,10 +102,12 @@ export function useReferrals(referralId?: string | number) {
   // Update a referral
   const updateReferralMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string | number; data: any }) => {
+      const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+      
       const { data: updatedData, error } = await supabase
         .from('referrals')
         .update(data)
-        .eq('id', id)
+        .eq('id', numericId)
         .select()
         .single();
 

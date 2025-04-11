@@ -16,6 +16,9 @@ export function useProviderMatching(referralId?: string | number) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'match' | 'distance' | 'availability'>('match');
 
+  // Convert referralId to number if it's a string
+  const numericReferralId = typeof referralId === 'string' ? parseInt(referralId, 10) : referralId;
+
   // Get matched providers for a referral
   const {
     data: matches = [],
@@ -23,19 +26,19 @@ export function useProviderMatching(referralId?: string | number) {
     error: matchesError,
     refetch: refetchMatches,
   } = useQuery({
-    queryKey: ['referral-matches', referralId],
+    queryKey: ['referral-matches', numericReferralId],
     queryFn: async () => {
-      if (!referralId) return [];
+      if (!numericReferralId) return [];
 
       const { data, error } = await supabase
         .from('referral_matches')
         .select('*, dhs_providers(*)')
-        .eq('referral_id', referralId);
+        .eq('referral_id', numericReferralId);
 
       if (error) throw error;
       return data || [];
     },
-    enabled: !!referralId,
+    enabled: !!numericReferralId,
   });
 
   // Get all available providers (for admin matching)
@@ -44,15 +47,15 @@ export function useProviderMatching(referralId?: string | number) {
     isLoading: isLoadingProviders,
     error: providersError,
   } = useQuery({
-    queryKey: ['available-providers', referralId, searchTerm, filters],
+    queryKey: ['available-providers', numericReferralId, searchTerm, filters],
     queryFn: async () => {
-      if (!referralId || !isAdmin) return [];
+      if (!numericReferralId || !isAdmin) return [];
 
       // Get referral details first to match against providers
       const { data: referral, error: referralError } = await supabase
         .from('referrals')
         .select('*')
-        .eq('id', referralId)
+        .eq('id', numericReferralId)
         .single();
 
       if (referralError) throw referralError;
@@ -83,16 +86,16 @@ export function useProviderMatching(referralId?: string | number) {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!referralId && isAdmin,
+    enabled: !!numericReferralId && isAdmin,
   });
 
   // Create provider matches
   const createMatchesMutation = useMutation({
     mutationFn: async (providerIds: number[]) => {
-      if (!referralId) throw new Error('Referral ID is required');
+      if (!numericReferralId) throw new Error('Referral ID is required');
 
       const matchesToCreate = providerIds.map(providerId => ({
-        referral_id: Number(referralId),
+        referral_id: numericReferralId,
         dhs_provider_id: providerId,
         is_selected: false,
         response: 'pending',
@@ -109,13 +112,13 @@ export function useProviderMatching(referralId?: string | number) {
       await supabase
         .from('referrals')
         .update({ status: 'matched' })
-        .eq('id', referralId);
+        .eq('id', numericReferralId);
 
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['referral-matches', referralId] });
-      queryClient.invalidateQueries({ queryKey: ['referral', referralId] });
+      queryClient.invalidateQueries({ queryKey: ['referral-matches', numericReferralId] });
+      queryClient.invalidateQueries({ queryKey: ['referral', numericReferralId] });
       toast({
         title: 'Providers matched',
         description: 'The selected providers have been matched with this referral.',
@@ -133,7 +136,7 @@ export function useProviderMatching(referralId?: string | number) {
   // Select a provider for a referral
   const selectProviderMutation = useMutation({
     mutationFn: async (matchId: number) => {
-      if (!referralId) throw new Error('Referral ID is required');
+      if (!numericReferralId) throw new Error('Referral ID is required');
 
       // First, update the selected match
       const { error: matchError } = await supabase
@@ -147,7 +150,7 @@ export function useProviderMatching(referralId?: string | number) {
       const { data, error: referralError } = await supabase
         .from('referrals')
         .update({ status: 'active', started_at: new Date().toISOString() })
-        .eq('id', referralId)
+        .eq('id', numericReferralId)
         .select()
         .single();
 
@@ -156,8 +159,8 @@ export function useProviderMatching(referralId?: string | number) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['referral-matches', referralId] });
-      queryClient.invalidateQueries({ queryKey: ['referral', referralId] });
+      queryClient.invalidateQueries({ queryKey: ['referral-matches', numericReferralId] });
+      queryClient.invalidateQueries({ queryKey: ['referral', numericReferralId] });
       toast({
         title: 'Provider selected',
         description: 'The provider has been selected for this referral.',
