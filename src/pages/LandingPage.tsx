@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -502,8 +503,12 @@ const LandingPage = () => {
               </NavigationMenu>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" asChild>
-                <Link to="/signin">Sign In</Link>
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/signin')}
+                className="cursor-pointer"
+              >
+                Sign In
               </Button>
               <Button variant="default" className="bg-referra-500 hover:bg-referra-600" asChild>
                 <Link to="/signup">Get Started</Link>
