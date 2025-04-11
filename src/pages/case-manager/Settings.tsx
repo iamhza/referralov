@@ -83,7 +83,7 @@ const Settings = () => {
           return;
         }
 
-        // Use a direct query without RLS to avoid policy recursion issues
+        // Use our security definer function to avoid RLS recursion
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
@@ -121,6 +121,11 @@ const Settings = () => {
             console.error('Error creating profile:', createError);
             setFetchError(`Could not create profile: ${createError.message}`);
           } else {
+            toast({
+              title: 'Profile created',
+              description: 'A basic profile has been created for you. Please update your details.',
+            });
+            
             form.reset({
               full_name: user.email?.split('@')[0] || '',
               display_name: '',

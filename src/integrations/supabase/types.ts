@@ -566,6 +566,10 @@ export type Database = {
         Args: { "": unknown }
         Returns: unknown
       }
+      is_profile_owner: {
+        Args: { profile_id: string }
+        Returns: boolean
+      }
       set_limit: {
         Args: { "": number }
         Returns: number
