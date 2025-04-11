@@ -126,7 +126,7 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
           userId: 'p1',
           userName: 'Minnesota Care Center',
           userRole: 'provider',
-          content: 'We need the client's insurance member ID before we can proceed with verification.',
+          content: "We need the client's insurance member ID before we can proceed with verification.",
           timestamp: '2025-04-15T11:20:00Z'
         }
       ]
