@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowRight, Search, UserPlus, MoreHorizontal, Loader2 } from 'lucide-react';
+import { ArrowRight, Search, UserPlus, MoreHorizontal, Loader2, AlertCircle, Database, CloudOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Link } from 'react-router-dom';
 import { useClientData } from '@/hooks/useClientData';
 
@@ -23,7 +24,7 @@ const statusColors = {
 
 export const ClientTable = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { clients, isLoading, error, refetch } = useClientData();
+  const { clients, isLoading, error, refetch, useMockData, toggleMockData, isApiAvailable } = useClientData();
   
   // Filter clients based on search query
   const filteredClients = clients.filter(client => 
@@ -50,17 +51,57 @@ export const ClientTable = () => {
           </Button>
         </div>
       </div>
+      
+      {useMockData && (
+        <Alert variant="warning" className="m-4 bg-amber-50 border-amber-200">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800">Using Mock Data</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            The application is currently using mock client data because the API is unavailable.
+            {isApiAvailable !== false && (
+              <Button 
+                variant="link" 
+                className="text-amber-700 p-0 h-auto font-medium underline ml-1"
+                onClick={() => toggleMockData(false)}
+              >
+                Switch to real API data
+              </Button>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {!useMockData && isApiAvailable && (
+        <div className="flex justify-end px-4 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs"
+            onClick={() => toggleMockData(true)}
+          >
+            <Database className="h-3 w-3 mr-1" />
+            Use Mock Data
+          </Button>
+        </div>
+      )}
+      
       <div className="overflow-x-auto">
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="h-8 w-8 text-referra-500 animate-spin" />
             <span className="ml-3 text-gray-500">Loading clients...</span>
           </div>
-        ) : error ? (
+        ) : error && !useMockData ? (
           <div className="flex justify-center items-center py-12">
             <div className="text-center">
               <p className="text-gray-500 mb-4">Failed to load client data</p>
-              <Button onClick={() => refetch()}>Try Again</Button>
+              <div className="flex gap-2 justify-center">
+                <Button onClick={() => refetch()}>Try Again</Button>
+                <Button variant="outline" onClick={() => toggleMockData(true)}>
+                  <CloudOff className="h-4 w-4 mr-2" />
+                  Use Mock Data
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
