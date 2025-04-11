@@ -1,6 +1,5 @@
-
-import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { 
   Card, 
   CardContent, 
@@ -17,6 +16,7 @@ import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const SignUp = () => {
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -26,7 +26,14 @@ const SignUp = () => {
   const [success, setSuccess] = useState(false);
   const { signUp, user } = useAuth();
 
-  // Redirect if already logged in
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const emailFromUrl = searchParams.get('email');
+    if (emailFromUrl) {
+      setEmail(emailFromUrl);
+    }
+  }, [location.search]);
+
   if (user) {
     return <Navigate to="/" />;
   }

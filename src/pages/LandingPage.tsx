@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -434,9 +433,9 @@ const LandingPage = () => {
   const handleStartNow = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      navigate(`/signin?email=${encodeURIComponent(email)}`);
+      navigate(`/signup?email=${encodeURIComponent(email)}`);
     } else {
-      navigate('/signin');
+      navigate('/signup');
     }
   };
 
@@ -682,7 +681,7 @@ const LandingPage = () => {
                       </div>
                     </div>
                     <div className="flex-1 mt-8">
-                      <h3 className="text-2xl font-bold mb-4 text-gray-900">{card.title}</h3>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{card.title}</h3>
                       <p className="text-gray-700 leading-relaxed mb-8">
                         {card.description}
                       </p>
@@ -948,7 +947,7 @@ const LandingPage = () => {
         </div>
       </footer>
 
-      <style jsx global>{`
+      <style jsx="true" global="true">{`
         @keyframes fadeInOut {
           0%, 100% { opacity: 0.2; }
           50% { opacity: 1; }
