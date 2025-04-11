@@ -19,7 +19,7 @@ export function useClientData(clientId?: string) {
         .from('user_profiles')
         .select('*')
         .eq('id', clientId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

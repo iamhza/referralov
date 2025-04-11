@@ -56,6 +56,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -97,6 +98,7 @@ const Settings = () => {
         }
 
         if (data) {
+          console.log('Profile data loaded:', data);
           form.reset({
             full_name: data.full_name || '',
             display_name: data.display_name || '',
@@ -108,14 +110,24 @@ const Settings = () => {
             sms_notifications: data.sms_notifications ?? false,
           });
         } else {
-          // If no profile exists yet, create a basic one
+          console.log('No profile found, checking user metadata');
+          // If no profile exists yet, try to get data from user metadata
+          const metadata = user.user_metadata || {};
+          
+          // Create a profile with data from signup if available
+          const profileData = {
+            id: user.id,
+            full_name: metadata.full_name || metadata.fullName || user.email?.split('@')[0] || '',
+            organization_name: metadata.organization || '',
+            role: metadata.role || 'case_manager'
+          };
+          
+          console.log('Creating profile with data:', profileData);
+          
+          // Create a basic profile
           const { error: createError } = await supabase
             .from('user_profiles')
-            .insert({
-              id: user.id,
-              full_name: user.email?.split('@')[0] || '',
-              role: 'case_manager'
-            });
+            .insert(profileData);
             
           if (createError) {
             console.error('Error creating profile:', createError);
@@ -127,10 +139,10 @@ const Settings = () => {
             });
             
             form.reset({
-              full_name: user.email?.split('@')[0] || '',
+              full_name: profileData.full_name,
               display_name: '',
               phone_number: '',
-              organization_name: '',
+              organization_name: profileData.organization_name,
               organization_role: '',
               avatar_url: '',
               email_notifications: true,
@@ -151,6 +163,7 @@ const Settings = () => {
 
   const onSubmit = async (values: ProfileFormValues) => {
     setIsLoading(true);
+    setSaveSuccess(false);
 
     try {
       if (!user?.id) {
@@ -161,6 +174,8 @@ const Settings = () => {
         });
         return;
       }
+
+      console.log('Updating profile with values:', values);
 
       const { error } = await supabase
         .from('user_profiles')
@@ -179,9 +194,11 @@ const Settings = () => {
         .eq('id', user.id);
 
       if (error) {
+        console.error('Error updating profile:', error);
         throw error;
       }
 
+      setSaveSuccess(true);
       toast({
         title: 'Profile updated',
         description: 'Your profile has been updated successfully.',
@@ -216,6 +233,14 @@ const Settings = () => {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{fetchError}</AlertDescription>
+            </Alert>
+          )}
+
+          {saveSuccess && (
+            <Alert className="mb-6 bg-green-50 border-green-200">
+              <AlertCircle className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-600">Success</AlertTitle>
+              <AlertDescription className="text-green-600">Your profile has been updated successfully.</AlertDescription>
             </Alert>
           )}
 
