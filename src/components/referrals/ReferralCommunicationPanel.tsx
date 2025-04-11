@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   MessageSquare, 
@@ -62,7 +61,7 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
       description: 'Provider needs to send intake forms to case manager.',
       status: 'completed',
       dueDate: '2025-04-15',
-      assignedTo: 'provider',
+      assignedTo: 'provider' as UserRole,
       dateCreated: '2025-04-12',
       lastUpdated: '2025-04-13',
       comments: [
@@ -70,7 +69,7 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
           id: 'c1',
           userId: 'p1',
           userName: 'Minnesota Care Center',
-          userRole: 'provider',
+          userRole: 'provider' as UserRole,
           content: 'Forms have been sent via email. Please confirm receipt.',
           timestamp: '2025-04-13T10:30:00Z'
         },
@@ -78,7 +77,7 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
           id: 'c2',
           userId: 'cm1',
           userName: 'Sarah Johnson',
-          userRole: 'case_manager',
+          userRole: 'case_manager' as UserRole,
           content: 'Received, thank you!',
           timestamp: '2025-04-13T14:15:00Z'
         }
@@ -90,14 +89,14 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
       description: 'Set up the first appointment for client assessment.',
       status: 'in_progress',
       dueDate: '2025-04-20',
-      assignedTo: 'case_manager',
+      assignedTo: 'case_manager' as UserRole,
       dateCreated: '2025-04-12',
       comments: [
         {
           id: 'c3',
           userId: 'cm1',
           userName: 'Sarah Johnson',
-          userRole: 'case_manager',
+          userRole: 'case_manager' as UserRole,
           content: 'Working on coordinating a time that works for the client. Will update soon.',
           timestamp: '2025-04-14T09:45:00Z'
         }
@@ -109,7 +108,7 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
       description: 'Provider needs to submit service agreement documentation.',
       status: 'pending',
       dueDate: '2025-04-25',
-      assignedTo: 'provider',
+      assignedTo: 'provider' as UserRole,
       dateCreated: '2025-04-12',
       comments: []
     },
@@ -119,14 +118,14 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
       description: 'Provider needs to verify client insurance and submit documentation.',
       status: 'blocked',
       dueDate: '2025-04-18',
-      assignedTo: 'provider',
+      assignedTo: 'provider' as UserRole,
       dateCreated: '2025-04-12',
       comments: [
         {
           id: 'c4',
           userId: 'p1',
           userName: 'Minnesota Care Center',
-          userRole: 'provider',
+          userRole: 'provider' as UserRole,
           content: "We need the client's insurance member ID before we can proceed with verification.",
           timestamp: '2025-04-15T11:20:00Z'
         }
@@ -158,7 +157,7 @@ const ReferralCommunicationPanel = ({ referralId }: { referralId: string }) => {
               id: `c${Date.now()}`,
               userId: 'cm1',
               userName: 'Sarah Johnson',
-              userRole: 'case_manager',
+              userRole: 'case_manager' as UserRole,
               content: newComment.trim(),
               timestamp: new Date().toISOString()
             }
