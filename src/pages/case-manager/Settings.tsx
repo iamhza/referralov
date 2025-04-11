@@ -75,16 +75,12 @@ const Settings = () => {
   // Fetch user profile data
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!user?.id) return;
+      
       setIsLoading(true);
       setFetchError(null);
       
       try {
-        if (!user?.id) {
-          setFetchError("User not authenticated. Please sign in again.");
-          setIsLoading(false);
-          return;
-        }
-
         console.log('Fetching profile for user ID:', user.id);
         
         const { data, error } = await supabase
@@ -102,6 +98,7 @@ const Settings = () => {
 
         if (data) {
           console.log('Profile data loaded:', data);
+          // Fill the form with the profile data
           form.reset({
             full_name: data.full_name || '',
             display_name: data.display_name || '',
@@ -113,45 +110,29 @@ const Settings = () => {
             sms_notifications: data.sms_notifications ?? false,
           });
         } else {
-          console.log('No profile found, checking user metadata');
-          // If no profile exists yet, try to get data from user metadata
+          console.log('No profile found for user ID:', user.id);
+          
+          // Use user metadata as fallback for some fields
           const metadata = user.user_metadata || {};
+          const defaultName = metadata.full_name || metadata.fullName || user.email?.split('@')[0] || '';
+          const defaultOrg = metadata.organization || '';
           
-          // Create a profile with data from signup if available
-          const profileData = {
-            id: user.id,
-            full_name: metadata.full_name || metadata.fullName || user.email?.split('@')[0] || '',
-            organization_name: metadata.organization || '',
-            role: metadata.role || 'case_manager'
-          };
+          toast({
+            title: 'Profile not found',
+            description: 'Your profile information could not be found. Please fill in your details.',
+            variant: 'destructive',
+          });
           
-          console.log('Creating profile with data:', profileData);
-          
-          // Create a basic profile
-          const { error: createError } = await supabase
-            .from('user_profiles')
-            .insert(profileData);
-            
-          if (createError) {
-            console.error('Error creating profile:', createError);
-            setFetchError(`Could not create profile: ${createError.message}`);
-          } else {
-            toast({
-              title: 'Profile created',
-              description: 'A basic profile has been created for you. Please update your details.',
-            });
-            
-            form.reset({
-              full_name: profileData.full_name,
-              display_name: '',
-              phone_number: '',
-              organization_name: profileData.organization_name,
-              organization_role: '',
-              avatar_url: '',
-              email_notifications: true,
-              sms_notifications: false,
-            });
-          }
+          form.reset({
+            full_name: defaultName,
+            display_name: '',
+            phone_number: '',
+            organization_name: defaultOrg,
+            organization_role: '',
+            avatar_url: '',
+            email_notifications: true,
+            sms_notifications: false,
+          });
         }
       } catch (error: any) {
         console.error('Unexpected error:', error);
@@ -161,7 +142,9 @@ const Settings = () => {
       }
     };
 
-    fetchProfile();
+    if (user?.id) {
+      fetchProfile();
+    }
   }, [user, form, toast]);
 
   const onSubmit = async (values: ProfileFormValues) => {
@@ -175,30 +158,66 @@ const Settings = () => {
           description: 'User not authenticated',
           variant: 'destructive',
         });
+        setIsLoading(false);
         return;
       }
 
       console.log('Updating profile with values:', values);
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('user_profiles')
-        .update({
-          full_name: values.full_name,
-          display_name: values.display_name,
-          phone_number: values.phone_number,
-          organization_name: values.organization_name,
-          organization_role: values.organization_role,
-          avatar_url: values.avatar_url,
-          email_notifications: values.email_notifications,
-          sms_notifications: values.sms_notifications,
-          updated_at: new Date().toISOString(),
-          profile_completed: true,
-        })
-        .eq('id', user.id);
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
 
       if (error) {
-        console.error('Error updating profile:', error);
         throw error;
+      }
+
+      let updateError;
+
+      if (data) {
+        // Profile exists, update it
+        const { error: updateProfileError } = await supabase
+          .from('user_profiles')
+          .update({
+            full_name: values.full_name,
+            display_name: values.display_name,
+            phone_number: values.phone_number,
+            organization_name: values.organization_name,
+            organization_role: values.organization_role,
+            avatar_url: values.avatar_url,
+            email_notifications: values.email_notifications,
+            sms_notifications: values.sms_notifications,
+            updated_at: new Date().toISOString(),
+            profile_completed: true,
+          })
+          .eq('id', user.id);
+
+        updateError = updateProfileError;
+      } else {
+        // Profile doesn't exist, create it
+        const { error: insertProfileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: user.id,
+            full_name: values.full_name,
+            display_name: values.display_name,
+            phone_number: values.phone_number,
+            organization_name: values.organization_name,
+            organization_role: values.organization_role,
+            avatar_url: values.avatar_url,
+            email_notifications: values.email_notifications,
+            sms_notifications: values.sms_notifications,
+            profile_completed: true,
+            role: user.user_metadata?.role || 'case_manager',
+          });
+
+        updateError = insertProfileError;
+      }
+
+      if (updateError) {
+        throw updateError;
       }
 
       setSaveSuccess(true);
