@@ -117,6 +117,39 @@ async function makeApiRequest<T>(
         };
       }
       
+      // Handle AWS Lambda specific response format
+      // Lambda proxy integration returns { statusCode, headers, body } format
+      if (data && data.statusCode && data.body) {
+        console.log('Lambda proxy response detected:', data);
+        
+        // If statusCode indicates an error, handle it accordingly
+        if (data.statusCode >= 400) {
+          let errorMessage = "Unknown error";
+          try {
+            // Parse the body if it's a string
+            const parsedBody = typeof data.body === 'string' ? JSON.parse(data.body) : data.body;
+            errorMessage = parsedBody.message || parsedBody.error || "API returned an error";
+          } catch (e) {
+            console.error('Error parsing Lambda response body:', e);
+          }
+          
+          return {
+            success: false,
+            error: `Lambda returned error (${data.statusCode}): ${errorMessage}`,
+            data: data // Include the full data for debugging
+          };
+        }
+        
+        // For successful responses, try to parse the body
+        try {
+          const parsedBody = typeof data.body === 'string' ? JSON.parse(data.body) : data.body;
+          return { success: true, data: parsedBody };
+        } catch (e) {
+          console.error('Error parsing Lambda success response body:', e);
+          return { success: true, data: data.body as unknown as T };
+        }
+      }
+      
       return { success: true, data };
     } catch (fetchError) {
       console.error('Fetch error details:', fetchError);

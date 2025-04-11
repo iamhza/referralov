@@ -4,9 +4,10 @@ import { awsApiClient } from '@/services/awsApiClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, CheckCircle, RefreshCw, Search } from 'lucide-react';
+import { AlertCircle, CheckCircle, RefreshCw, Search, AlertTriangle, Code } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const SAMPLE_PAYLOAD = {
   name: "Jane Doe",
@@ -34,6 +35,46 @@ export function ApiTester() {
   const [payload, setPayload] = useState(JSON.stringify(SAMPLE_PAYLOAD, null, 2));
   const [clientId, setClientId] = useState('');
   const [clientData, setClientData] = useState<any>(null);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(false);
+  const [connectionState, setConnectionState] = useState<'unchecked' | 'success' | 'error'>('unchecked');
+  
+  // Check API connection
+  const checkConnection = async () => {
+    setIsCheckingConnection(true);
+    setConnectionState('unchecked');
+    
+    try {
+      console.log("Testing API connection...");
+      const response = await awsApiClient.testConnection();
+      console.log("Connection response:", response);
+      
+      if (response.success) {
+        setConnectionState('success');
+        toast({
+          title: "API Connection Successful",
+          description: "Successfully connected to the API endpoint",
+          variant: "default",
+        });
+      } else {
+        setConnectionState('error');
+        toast({
+          title: "API Connection Failed",
+          description: `Error: ${response.error}`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Connection test failed:", error);
+      setConnectionState('error');
+      toast({
+        title: "API Connection Failed",
+        description: `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsCheckingConnection(false);
+    }
+  };
   
   const testApi = async () => {
     setIsLoading(true);
@@ -68,15 +109,24 @@ export function ApiTester() {
       // If successful and we got a client ID back, store it for easy retrieval
       if (response.success && response.data?.clientId) {
         setClientId(response.data.clientId);
+        toast({
+          title: "API Test Successful",
+          description: "The API request was successful and returned a client ID.",
+          variant: "default",
+        });
+      } else if (response.success) {
+        toast({
+          title: "API Request Processed",
+          description: "The request was processed, but no client ID was returned.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "API Test Failed",
+          description: `Error: ${response.error}`,
+          variant: "destructive",
+        });
       }
-      
-      toast({
-        title: response.success ? "API Test Successful" : "API Test Failed",
-        description: response.success 
-          ? "The API request was successful." 
-          : `Error: ${response.error}`,
-        variant: response.success ? "default" : "destructive",
-      });
     } catch (error) {
       console.error("Test failed:", error);
       setResult({ 
@@ -154,6 +204,33 @@ export function ApiTester() {
     return formattedData;
   };
   
+  // Determine if we're dealing with a Lambda proxy integration response
+  const isLambdaProxyResponse = (data: any) => {
+    return data && 
+           typeof data === 'object' && 
+           'statusCode' in data && 
+           'headers' in data && 
+           'body' in data;
+  };
+  
+  // Format Lambda proxy response for better display
+  const formatLambdaProxyResponse = (data: any) => {
+    let formattedResponse = { ...data };
+    
+    if (isLambdaProxyResponse(data)) {
+      try {
+        // Try to parse the body as JSON
+        if (typeof data.body === 'string') {
+          formattedResponse.parsedBody = JSON.parse(data.body);
+        }
+      } catch (e) {
+        formattedResponse.parsedBody = { error: "Could not parse body as JSON" };
+      }
+    }
+    
+    return formattedResponse;
+  };
+  
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -163,6 +240,47 @@ export function ApiTester() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-6">
+          <Button 
+            variant={connectionState === 'success' ? "outline" : "default"}
+            className={connectionState === 'success' ? "bg-green-50 border-green-200 text-green-700" : ""}
+            onClick={checkConnection}
+            disabled={isCheckingConnection}
+          >
+            {isCheckingConnection ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Checking Connection...
+              </>
+            ) : connectionState === 'success' ? (
+              <>
+                <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                Connection Verified
+              </>
+            ) : connectionState === 'error' ? (
+              <>
+                <AlertCircle className="mr-2 h-4 w-4" />
+                Connection Failed - Try Again
+              </>
+            ) : (
+              <>
+                <Code className="mr-2 h-4 w-4" />
+                Check API Connection
+              </>
+            )}
+          </Button>
+          
+          {connectionState === 'error' && (
+            <Alert variant="destructive" className="mt-3">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Connection Error</AlertTitle>
+              <AlertDescription>
+                Could not connect to the API endpoint. Check your AWS configuration and make sure your API is deployed and accessible.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+        
         <Tabs defaultValue="insert" className="w-full">
           <TabsList className="grid grid-cols-2 mb-4">
             <TabsTrigger value="insert">Insert Client</TabsTrigger>
@@ -173,7 +291,7 @@ export function ApiTester() {
             <div className="space-y-4">
               <div className="p-4 bg-gray-100 rounded-md">
                 <h3 className="font-semibold mb-2">Endpoint:</h3>
-                <p className="break-all text-sm">https://qcxg71ospg.execute-api.us-east-2.amazonaws.com/insertClientData</p>
+                <p className="break-all text-sm">{API_URL}/insertClientData</p>
                 
                 <h3 className="font-semibold mt-4 mb-2">Test Payload:</h3>
                 <textarea 
@@ -192,8 +310,44 @@ export function ApiTester() {
                     }
                     <h3 className="font-semibold">Response:</h3>
                   </div>
+                  
+                  {result.data && isLambdaProxyResponse(result.data) && (
+                    <div className="mb-3">
+                      <Alert variant={result.data.statusCode >= 400 ? "destructive" : "default"} className="mb-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Lambda Proxy Response Detected</AlertTitle>
+                        <AlertDescription>
+                          Status: {result.data.statusCode} - 
+                          {result.data.statusCode >= 400 
+                            ? " Error in Lambda function" 
+                            : " Lambda function executed successfully but returned proxy format"}
+                        </AlertDescription>
+                      </Alert>
+                      
+                      {result.data.statusCode === 500 && (
+                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm mb-3">
+                          <p className="font-medium text-yellow-800">Troubleshooting Tips:</p>
+                          <ul className="list-disc pl-5 mt-1 text-yellow-700 space-y-1">
+                            <li>Check your Lambda function logs in AWS CloudWatch</li>
+                            <li>Verify your Lambda function handler is properly exporting the handler function</li>
+                            <li>Make sure no unhandled exceptions are occurring in your Lambda code</li>
+                          </ul>
+                        </div>
+                      )}
+                      
+                      <div className="mb-2">
+                        <h4 className="text-sm font-medium mb-1">Response Body:</h4>
+                        <pre className="p-3 bg-gray-800 text-gray-200 rounded text-xs overflow-auto">
+                          {typeof result.data.body === 'string' 
+                            ? result.data.body 
+                            : JSON.stringify(result.data.body, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+                  
                   <pre className={`p-4 rounded text-sm overflow-auto ${result.success ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'}`}>
-                    {JSON.stringify(result, null, 2)}
+                    {JSON.stringify(formatLambdaProxyResponse(result.data), null, 2)}
                   </pre>
                   
                   {result.success && result.data?.clientId && (
