@@ -1,5 +1,5 @@
 // AWS API configuration
-const API_URL = import.meta.env.VITE_AWS_API_URL || "";
+const API_URL = import.meta.env.VITE_AWS_API_URL || "https://nndjr3excb.execute-api.us-east-2.amazonaws.com/dev";
 const API_KEY = import.meta.env.VITE_AWS_API_KEY || "";
 
 interface ApiResponse<T> {
